@@ -12,6 +12,10 @@ db = client.dbsparta
 def home():
     return render_template('index.html')
 
+@app.route('/sign_up')
+def sign_up():
+    return render_template('sign_up.html')
+
 @app.route("/stock", methods=["POST"])
 def stock_post():
     code_receive = request.form['code_give']
@@ -72,6 +76,22 @@ def stock_post():
 def stock_get():
     stock_list = list(db.stock.find({}, {'_id': False}))
     return jsonify({'movies':stock_list})
+
+@app.route("/sign_up", methods=["POST"])
+def sign_up_post():
+    user_name_give = request.form['user_name_give']
+    id_give = request.form['id_give']
+    password_give = request.form['password_give']
+
+    user_info = {
+        'user_name':user_name_give,
+        'id':id_give,
+        'password':password_give,
+    }
+    db.users.insert_one(user_info)
+    ## ID, Name 중복확인코드구현 필요
+    return jsonify({'msg':'회원가입 확인용'})
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
