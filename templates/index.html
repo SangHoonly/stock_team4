@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+              integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+                crossorigin="anonymous"></script>
+
+        <title>주식 종목 한 눈에 보기</title>
+
+        <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+
+        <style>
+            * {
+                font-family: 'Gowun Dodum', sans-serif;
+            }
+
+            .mytitle {
+                width: 100%;
+                height: 250px;
+
+                background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://ecosophialab.com/wp-content/uploads/2020/07/200720_%EC%98%A4%ED%94%BC%EB%8B%88%EC%96%B8_%EA%B8%B0%ED%9B%84%EC%9C%84%EA%B8%B0_%EC%8B%9C%EB%8C%80%EC%9D%98_%EA%B8%88%EC%9C%B5_%EC%82%AC%EC%A7%84_main.jpg');
+                background-position: center;
+                background-size: cover;
+
+                color: white;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .mytitle > button {
+                width: 200px;
+                height: 50px;
+
+                background-color: transparent;
+                color: white;
+
+                border-radius: 50px;
+                border: 1px solid white;
+
+                margin-top: 10px;
+            }
+
+            .mytitle > button:hover {
+                border: 2px solid white;
+            }
+
+            .mycomment {
+                color: gray;
+            }
+
+            .mycards {
+                margin: 20px auto 0px auto;
+                width: 95%;
+                max-width: 1200px;
+
+            }
+
+            .mypost {
+                width: 95%;
+                max-width: 500px;
+                margin: 20px auto 0px auto;
+                padding: 20px;
+                box-shadow: 0px 0px 3px 0px gray;
+
+                display: none;
+            }
+
+            .mybtns {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+
+                margin-top: 20px;
+            }
+
+            .mybtns > button {
+                margin-right: 10px;
+            }
+
+            .col_up {
+                color: red;
+            }
+
+            .col_down {
+                color: blue;
+            }
+
+            .iframeimg {
+                width: 700px;
+                height: 290px;
+                position: absolute;
+                z-index: 1;
+                frameborder: 0;
+
+                display: none;
+            }
+
+            .card-bodys {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+        </style>
+        <script>
+            $(document).ready(function () {
+                listing();
+            });
+
+            function listing() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/stock',
+                    data: {},
+                    success: function (response) {
+                        let rows = response['movies']
+
+                        for (let i = 0 ; i < rows.length; i++){
+                            let stock_name = rows[i]['stock_name']
+                            let stock_code = rows[i]['stock_code']
+                            let close = rows[i]['close']
+                            let gclose1 = rows[i]['gclose1']
+                            let gclose2 = rows[i]['gclose2']
+                            let is_up = rows[i]['is_up']
+                            let comment = rows[i]['comment']
+
+                            let temp_html = ''
+                            if( is_up ){
+                                temp_html =
+                                    `<div class="col_up">
+                                        <div class="card h-100">
+                                            <div class="card-body" id="${stock_code}" onmouseover="hoin(this)" onmouseout="hoout(this)">
+                                                <h5 class="card-title" style="color: black">${stock_name}</h5>
+                                                <p class="card-close">${close}</p>
+                                                <p class="card-gc1">${gclose1} | ${gclose2}%</p>
+                                                <p class="mycomment">${comment}</p>
+                                                <iframe id="${stock_code}_ho" class="iframeimg" src="https://ssl.pstatic.net/imgfinance/chart/item/candle/day/${stock_code}.png?sidcode=1651320112515"></iframe>
+                                            </div>
+                                        </div>
+                                    </div>`
+                            }else{
+                                temp_html =
+                                    `<div class="col_down">
+                                        <div class="card h-100">
+                                            <div class="card-body" id="${stock_code}" onmouseover="hoin(this)" onmouseout="hoout(this)">
+                                                <h5 class="card-title" style="color: black">${stock_name}</h5>
+                                                <p class="card-close">${close}</p>
+                                                <p class="card-gc1">${gclose1} | ${gclose2}%</p>
+                                                <p class="mycomment">${comment}</p>
+                                                <iframe id="${stock_code}_ho" class="iframeimg" src="https://ssl.pstatic.net/imgfinance/chart/item/candle/day/${stock_code}.png?sidcode=1651320112515"></iframe>
+                                            </div>
+                                        </div>
+                                    </div>`
+                            }
+
+                            $('#cards-box').append(temp_html)
+                        }
+                    }
+                })
+            }
+
+            function posting() {
+                let code = $('#code').val()
+                let comment = $('#comment').val()
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/stock',
+                    data: {code_give: code, comment_give:comment},
+                    success: function (response) {
+                        alert(response['msg'])
+                        window.location.reload()
+                    }
+                });
+            }
+
+            function open_box() {
+                $('#post-box').show()
+            }
+
+            function close_box() {
+                $('#post-box').hide()
+            }
+
+            function hoin(obj){
+                let obid = obj.id + '_ho'
+                $(`#${obid}`).show()
+            }
+            function hoout(obj){
+                let obid = obj.id + '_ho'
+                $(`#${obid}`).hide()
+            }
+
+
+        </script>
+    </head>
+
+    <body>
+        <div class="mytitle">
+            <h1>주식 종목 한 눈에 보기</h1>
+            <button onclick="open_box()">관심 종목 추가하기</button>
+        </div>
+
+        <div class="mypost" id="post-box">
+            <div class="form-floating mb-3">
+                <input id="code" type="email" class="form-control" placeholder="name@example.com">
+                <label>종목코드</label>
+            </div>
+            <div class="form-floating">
+                <textarea id="comment" class="form-control" placeholder="Leave a comment here"></textarea>
+                <label for="comment">코멘트</label>
+            </div>
+            <div class="mybtns">
+                <button onclick="posting()" type="button" class="btn btn-dark">기록하기</button>
+                <button onclick="close_box()" type="button" class="btn btn-outline-dark">닫기</button>
+            </div>
+        </div>
+        <div class="mycards">
+            <div class="row row-cols-1 row-cols-md-4 g-4" id="cards-box">
+
+            </div>
+        </div>
+    </body>
+
+</html>
