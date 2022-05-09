@@ -1,0 +1,5 @@
+requests~=2.27.1
+Flask~=2.1.2
+bs4~=0.0.1
+beautifulsoup4~=4.11.1
+pymongo~=4.1.1
