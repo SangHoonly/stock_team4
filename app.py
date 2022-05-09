@@ -1,23 +1,25 @@
 from flask import Flask, render_template, request, jsonify
+
 app = Flask(__name__)
 
 import requests
 from bs4 import BeautifulSoup
 
 from pymongo import MongoClient
+
 client = MongoClient('mongodb+srv://test:sparta@cluster0.zu2cz.mongodb.net/Cluster0?retryWrites=true&w=majority')
 db = client.dbsparta
+
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route("/stock", methods=["POST"])
+
+@app.route("/stock", methods=["GET"])
 def stock_post():
     code_receive = request.form['code_give']
-    comment_receive = request.form['comment_give']
-
-    url = 'https://finance.naver.com/item/main.naver?code=' + code_receive
+    url = 'https://finance.naver.com/'
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
     data = requests.get(url, headers=headers)
@@ -56,22 +58,62 @@ def stock_post():
             '-' + soup.select_one("#chart_area > div.rate_info > div > p.no_exday > em:nth-child(4) > span.blind").text)
 
     doc = {
-        'stock_name':stock_name,
-        'stock_code':code_receive,
-        'close':close,
-        'gclose1':gap_close[0],
-        'gclose2':gap_close[1],
-        'is_up': is_up,
-        'comment':comment_receive
+        'stock_name': stock_name,
+        'stock_code': code_receive,
+        'close': close,
+        'gclose1': gap_close[0],
+        'gclose2': gap_close[1],
+        'is_up': is_up
     }
-    db.stock.insert_one(doc)
 
-    return jsonify({'msg':'저장 완료!'})
+    return jsonify({'msg': '저장 완료!'})
+
 
 @app.route("/stock", methods=["GET"])
 def stock_get():
     stock_list = list(db.stock.find({}, {'_id': False}))
-    return jsonify({'movies':stock_list})
+    return jsonify({'movies': stock_list})
+
+
+@app.route("/stock/crawling", methods=["GET"])
+def stock_get_crawl():
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+    data = requests.get('https://finance.naver.com/', headers=headers)
+
+    soup = BeautifulSoup(data.text, 'html.parser')
+
+    # #_topItems1 > tr:nth-child(1) > td:nth-child(3)
+    # #_topItems1 > tr:nth-child(1) > td:nth-child(4)
+    # print(stocks)
+    # _topItems1 > tr:nth-child(1) > th > a
+    stocks = soup.select('#_topItems1 > tr')
+    result = []
+    for stock in stocks:
+        name = stock.select_one('th > a').text
+        price = stock.select_one('td').text
+        up_down = stock.select_one('td:nth-child(3)').text
+        percent = stock.select_one('td:nth-child(4)').text
+        code = stock.select_one('th > a')['href'].split('code=')[1]
+        #print(name, price, up_down, percent, code)
+        doc = {
+            'stock_name': name,
+            'stock_code': code
+        }
+        result.append(doc)
+
+    return jsonify({'stock': result})
+
+
+@app.route("/main", methods=["GET"])
+def get():
+    return render_template('guest_main.html')
+
+
+@app.route("/user/main", methods=["GET"])
+def user_get():
+    return render_template('user_main.html')
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
