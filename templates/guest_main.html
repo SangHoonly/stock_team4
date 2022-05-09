@@ -70,12 +70,12 @@
                                         <div class="card h-100">
                                             <div class="card-body" id="${stock_code}">
                                                 <h5 class="card-title" style="color: black">${stock_name}</h5>
-                                                <iframe id="${stock_code}_ho" class="iframeimg" src="https://ssl.pstatic.net/imgfinance/chart/item/candle/day/${stock_code}.png?sidcode=1651320112515"></iframe>
+                                                <img  src="https://ssl.pstatic.net/imgfinance/chart/item/candle/day/${stock_code}.png?sidcode=1651320112515"></img>
                                             </div>
                                         </div>
                                     </div>`
                         console.log(stock_name, temp_html);
-                        $('.chart-group').append(temp_html);
+                        $('#cards-box').append(temp_html);
                     }
                 }
             })
@@ -88,6 +88,8 @@
 <button type="button" id="myButton" onclick="goMine()" class="btn btn-info">내가 관심있는 종목 골라보기</button>
 
 <div class="chart-group">
+    <div class="row row-cols-1 row-cols-md-2 g-2" id="cards-box">
+    </div>
 </div>
 </body>
 
