@@ -15,8 +15,12 @@ db = client.dbsparta
 def home():
     return render_template('index.html')
 
+  
+@app.route('/sign_up')
+def sign_up():
+    return render_template('sign_up.html')
 
-@app.route("/stock", methods=["GET"])
+@app.route("/stock", methods=["POST"])
 def stock_post():
     code_receive = request.form['code_give']
     url = 'https://finance.naver.com/'
@@ -113,6 +117,32 @@ def get():
 @app.route("/user/main", methods=["GET"])
 def user_get():
     return render_template('user_main.html')
+
+
+@app.route("/sign_up", methods=["POST"])
+def sign_up_post():
+    user_name_give = request.form['user_name_give']
+    id_give = request.form['id_give']
+    password_give = request.form['password_give']
+
+    if user_name_give and id_give and password_give: ## 하나라도 비어있으면 False
+        user_list = list(db.users.find({}, {'_id': False}))
+
+        for user in user_list:
+            if user_name_give in user['user_name']:
+                return jsonify({'msg': '이름이 중복되었습니다.', 'state': False})
+            if id_give in user['id']:
+                return jsonify({'msg': '아이디가 중복되었습니다.', 'state': False})
+
+        user_info = {
+            'user_name':user_name_give,
+            'id':id_give,
+            'password':password_give,
+        }
+        db.users.insert_one(user_info)
+        return jsonify({'msg':'회원가입 완료.', 'state': True})
+    else:
+        return jsonify({'msg':'모든 칸을 채워주세요.', 'state': False})
 
 
 if __name__ == '__main__':
