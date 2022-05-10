@@ -1,7 +1,7 @@
 name: Python CI / CD Settings
 
 env:
-  S3_BUCKET_NAME: realTime-stock-s3-bucket
+  S3_BUCKET_NAME: real-time-stock-s3-bucket
 
 on:
   push:
