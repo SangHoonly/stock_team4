@@ -24,6 +24,7 @@ db = client.dbsparta
 # 이 문자열은 서버만 알고있기 때문에, 내 서버에서만 토큰을 인코딩(=만들기)/디코딩(=풀기) 할 수 있습니다.
 SECRET_KEY = 'SPARTA'
 
+
 @app.route("/")
 def home():
     return render_template('index.html')
@@ -41,10 +42,37 @@ def user_main():
     except jwt.exceptions.DecodeError:
         return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
+
 # 게스트 메인
 @app.route("/main", methods=["GET"])
 def get():
-    return render_template('guest_main.html')
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+    data = requests.get('https://finance.naver.com/', headers=headers)
+
+    soup = BeautifulSoup(data.text, 'html.parser')
+
+    # #_topItems1 > tr:nth-child(1) > td:nth-child(3)
+    # #_topItems1 > tr:nth-child(1) > td:nth-child(4)
+    # print(stocks)
+    # _topItems1 > tr:nth-child(1) > th > a
+    stocks = soup.select('#_topItems1 > tr')
+    result = []
+    for stock in stocks:
+        name = stock.select_one('th > a').text
+        price = stock.select_one('td').text
+        up_down = stock.select_one('td:nth-child(3)').text
+        percent = stock.select_one('td:nth-child(4)').text
+        code = stock.select_one('th > a')['href'].split('code=')[1]
+        # print(name, price, up_down, percent, code)
+        doc = {
+            'stock_name': name,
+            'stock_code': code
+        }
+        result.append(doc)
+    stock = {'stock': result}
+    print(stock)
+    return render_template('guest_main.html', stock=stock)
 
 
 @app.route('/login')
@@ -194,37 +222,6 @@ def stock_get():
     return jsonify({'movies': stock_list})
 
 
-# 주식 크롤링
-@app.route("/stock/crawling", methods=["GET"])
-def stock_get_crawl():
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
-    data = requests.get('https://finance.naver.com/', headers=headers)
-
-    soup = BeautifulSoup(data.text, 'html.parser')
-
-    # #_topItems1 > tr:nth-child(1) > td:nth-child(3)
-    # #_topItems1 > tr:nth-child(1) > td:nth-child(4)
-    # print(stocks)
-    # _topItems1 > tr:nth-child(1) > th > a
-    stocks = soup.select('#_topItems1 > tr')
-    result = []
-    for stock in stocks:
-        name = stock.select_one('th > a').text
-        price = stock.select_one('td').text
-        up_down = stock.select_one('td:nth-child(3)').text
-        percent = stock.select_one('td:nth-child(4)').text
-        code = stock.select_one('th > a')['href'].split('code=')[1]
-        # print(name, price, up_down, percent, code)
-        doc = {
-            'stock_name': name,
-            'stock_code': code
-        }
-        result.append(doc)
-
-    return jsonify({'stock': result})
-
-
 @app.route("/sign_up", methods=["POST"])
 def sign_up_post():
     user_name_give = request.form['user_name_give']
@@ -259,6 +256,7 @@ def my_stock_list():
     # 수정하기 - /stock 참고
     return jsonify({'stock': 'result'})
 
+
 # 유저의 관심종목 등록
 @app.route("/user/stock/post", methods=["POST"])
 def user_stock_post():
@@ -267,7 +265,7 @@ def user_stock_post():
     buy_date_receive = request.form['buy_date_give']
     user_id_receive = request.form['user_id_give']
     url = 'https://finance.naver.com/'
-    url += 'item/main.naver?code='+ code_receive
+    url += 'item/main.naver?code=' + code_receive
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
     data = requests.get(url, headers=headers)
@@ -283,7 +281,7 @@ def user_stock_post():
         'stock_name': stock_name,
         'stock_code': code_receive,
         'buy_price': buy_price_receive,
-        'buy_date': datetime.datetime.strptime(buy_date_receive,"%Y-%m-%d"),
+        'buy_date': datetime.datetime.strptime(buy_date_receive, "%Y-%m-%d"),
         'created_at': datetime.datetime.now(),
         'updated_at': datetime.datetime.now()
     }
@@ -291,11 +289,12 @@ def user_stock_post():
 
     return jsonify({'msg': '저장 완료!'})
 
+
 # 유저의 관심종목 불러오기
 @app.route("/user/stock/post2", methods=["POST"])
 def user_stock_get():
     user_id_receive = request.form['user_id_give']
-    stock_list = list(db.favorites.find({'user_id':user_id_receive}, {'_id': False}))
+    stock_list = list(db.favorites.find({'user_id': user_id_receive}, {'_id': False}))
     result = []
     for stock in stock_list:
         url = 'https://finance.naver.com/'
@@ -308,11 +307,11 @@ def user_stock_get():
         close = soup.select_one("#chart_area > div.rate_info > div > p.no_today > em > span.blind").text
 
         temp_doc = {
-            'stock_name' : stock['stock_name'],
-            'stock_code' : stock['stock_code'],
-            'buy_price' : stock['buy_price'],
-            'close' : close,
-            'date_delta' : str(datetime.datetime.now() - stock['buy_date']).split('day')[0]
+            'stock_name': stock['stock_name'],
+            'stock_code': stock['stock_code'],
+            'buy_price': stock['buy_price'],
+            'close': close,
+            'date_delta': str(datetime.datetime.now() - stock['buy_date']).split('day')[0]
         }
         result.append(temp_doc)
 
