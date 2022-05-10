@@ -20,29 +20,37 @@ from pymongo import MongoClient
 client = MongoClient('mongodb+srv://test:sparta@cluster0.zu2cz.mongodb.net/Cluster0?retryWrites=true&w=majority')
 db = client.dbsparta
 
-
 # JWT 토큰을 만들 때 필요한 비밀문자열입니다. 아무거나 입력해도 괜찮습니다.
 # 이 문자열은 서버만 알고있기 때문에, 내 서버에서만 토큰을 인코딩(=만들기)/디코딩(=풀기) 할 수 있습니다.
 SECRET_KEY = 'SPARTA'
 
-
-@app.route('/')
+@app.route("/")
 def home():
+    return render_template('index.html')
+
+
+@app.route("/user/main", methods=["GET"])
+def user_main():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.user.find_one({"id": payload['id']})
-        return render_template('index2.html', nickname=user_info["nick"])
+        return render_template('user_main.html', nickname=user_info["nick"])
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
     except jwt.exceptions.DecodeError:
         return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
+# 게스트 메인
+@app.route("/main", methods=["GET"])
+def get():
+    return render_template('guest_main.html')
+
+
 @app.route('/login')
 def login():
     msg = request.args.get("msg")
     return render_template('login.html', msg=msg)
-
 
 
 @app.route('/sign_up')
@@ -87,13 +95,13 @@ def api_login():
         # exp에는 만료시간을 넣어줍니다. 만료시간이 지나면, 시크릿키로 토큰을 풀 때 만료되었다고 에러가 납니다.
         payload = {
             'id': id_receive,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5)
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60 * 60 * 24)
         }
         # 디코드가 되어있어서 .decode('utf-8') 없앰
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
         # token을 줍니다.
-        return jsonify({'result': 'success', 'token': token})
+        return jsonify({'result': 'success', 'token': token, 'user_id': id_receive})
     # 찾지 못하면
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
@@ -114,7 +122,6 @@ def api_valid():
         # token을 시크릿키로 디코딩합니다.
         # 보실 수 있도록 payload를 print 해두었습니다. 우리가 로그인 시 넣은 그 payload와 같은 것이 나옵니다.
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        print(payload)
 
         # payload 안에 id가 들어있습니다. 이 id로 유저정보를 찾습니다.
         # 여기에선 그 예로 닉네임을 보내주겠습니다.
@@ -125,7 +132,6 @@ def api_valid():
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
     except jwt.exceptions.DecodeError:
         return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
-
 
 
 @app.route("/stock", methods=["POST"])
@@ -219,18 +225,6 @@ def stock_get_crawl():
     return jsonify({'stock': result})
 
 
-# 게스트 메인
-@app.route("/main", methods=["GET"])
-def get():
-    return render_template('guest_main.html')
-
-
-
-@app.route("/user/main", methods=["GET"])
-def user_get():
-    return render_template('user_main.html')
-
-
 @app.route("/sign_up", methods=["POST"])
 def sign_up_post():
     user_name_give = request.form['user_name_give']
@@ -257,16 +251,66 @@ def sign_up_post():
         return jsonify({'msg': '모든 칸을 채워주세요.', 'state': False})
 
 
-@app.route("/my-main", methods=["GET"])
-def my_main():
-    return render_template("user_main.html")
-
-
 # 주식 DB 조회
 @app.route("/my-stock-list", methods=["GET"])
 def my_stock_list():
     # 수정하기 - /stock 참고
     return jsonify({'stock': 'result'})
+
+# 유저의 관심종목 등록
+@app.route("/user/stock/post", methods=["POST"])
+def user_stock_post():
+    code_receive = request.form['code_give']
+    buy_price_receive = request.form['buy_price_give']
+    buy_date_receive = request.form['buy_date_give']
+    url = 'https://finance.naver.com/'
+    url += 'item/main.naver?code='+ code_receive
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+    data = requests.get(url, headers=headers)
+
+    soup = BeautifulSoup(data.text, 'html.parser')
+
+    stock_name = soup.select_one('#middle > div.h_company > div.wrap_company > h2 > a').text
+    # close = soup.select_one("#chart_area > div.rate_info > div > p.no_today > em > span.blind").text
+
+    a = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    doc = {
+        'stock_name': stock_name,
+        'stock_code': code_receive,
+        'buy_price': buy_price_receive,
+        'buy_date': datetime.datetime.strptime(buy_date_receive,"%Y-%m-%d")
+    }
+    db.user_stock.insert_one(doc)
+
+    return jsonify({'msg': '저장 완료!'})
+
+# 유저의 관심종목 불러오기
+@app.route("/user/stock/get", methods=["GET"])
+def user_stock_get():
+    stock_list = list(db.user_stock.find({}, {'_id': False}))
+
+    result = []
+    for stock in stock_list:
+        url = 'https://finance.naver.com/'
+        url += 'item/main.naver?code=' + stock['stock_code']
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
+        data = requests.get(url, headers=headers)
+        soup = BeautifulSoup(data.text, 'html.parser')
+
+        close = soup.select_one("#chart_area > div.rate_info > div > p.no_today > em > span.blind").text
+
+        temp_doc = {
+            'stock_name' : stock['stock_name'],
+            'stock_code' : stock['stock_code'],
+            'buy_price' : stock['buy_price'],
+            'close' : close,
+            'date_delta' : str(datetime.datetime.now() - stock['buy_date'])[:1]
+        }
+        result.append(temp_doc)
+
+    return jsonify({'result': result})
 
 
 if __name__ == '__main__':
