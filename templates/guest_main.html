@@ -11,7 +11,8 @@
 
     <script>
         function goMine() {
-            location.href = "/my-main";
+            //location.href = "/my-main";
+            window.location.reload();
         }
     </script>
     <style>
@@ -28,12 +29,6 @@
             align-items: center;
         }
 
-        .chart {
-            width: 500px;
-            height: 400px;
-            background-color: yellowgreen;
-        }
-
         .h1 {
             margin: 30px 30px 50px 30px;
             padding: 5px;
@@ -45,16 +40,28 @@
             font-family: 'Gowun Dodum', sans-serif;
             margin-top: 20px;
             margin-left: 83%;
+            margin-bottom: 10px;
+        }
+
+        #logout {
+            margin-top: 10px;
             margin-bottom: 20px;
+            margin-left: 92%;
+            font-family: 'Gowun Dodum', sans-serif;
         }
 
     </style>
     <script>
         $(document).ready(function () {
-            listing();
+            user(); // 토큰 O
+            guest(); // 토큰 X
         });
 
-        function listing() {
+
+        function guest() {
+            $(".h1").text('실시간 인기 주식');
+            $('.button-group').css("display", "");
+            $('#cards-box').empty();
             $.ajax({
                 type: 'GET',
                 url: '/stock/crawling',
@@ -80,13 +87,25 @@
                 }
             })
         }
+
+        function user() {
+            $(".h1").text('내가 담은 주식');
+            // $('#myButton').css("display", "");
+            $('#cards-box').empty();
+
+        }
+
     </script>
 </head>
 
 <body>
-<h1 class="h1">실시간 인기 주식</h1>
-<button type="button" id="myButton" onclick="goMine()" class="btn btn-info">내가 관심있는 종목 골라보기</button>
-
+<h1 class="h1"></h1>
+<button type="button" id="myButton" onclick="goMine()" class="btn btn-info" style="display:none">내가 관심있는 종목 골라보기
+</button>
+<div class="button-group" style="display:none">
+    <button type="button" id="myButton" onclick="goMine()" class="btn btn-info">실시간 인기 주식으로 돌아가기</button>
+    <button type="button" id="logout" onclick="logout()" class="btn btn-secondary">로그아웃</button>
+</div>
 <div class="chart-group">
     <div class="row row-cols-1 row-cols-md-2 g-2" id="cards-box">
     </div>
