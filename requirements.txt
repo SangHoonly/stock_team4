@@ -3,3 +3,6 @@ Flask~=2.1.2
 bs4~=0.0.1
 beautifulsoup4~=4.11.1
 pymongo~=4.1.1
+PyJWT~=2.3.0
+Datetime~=4.4
+dnspython~=2.2.1
