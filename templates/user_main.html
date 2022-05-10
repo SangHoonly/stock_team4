@@ -37,7 +37,7 @@
                 $.ajax({
                     type: 'POST',
                     url: '/user/stock/post',
-                    data: {code_give: code, buy_price_give: buy_price, buy_date_give: buy_date},
+                    data: {code_give: code, buy_price_give: buy_price, buy_date_give: buy_date,user_id_give:$.cookie('user_id')},
                     success: function (response) {
                         alert(response['msg'])
                         window.location.reload()
@@ -47,9 +47,9 @@
 
             function listing() {
                 $.ajax({
-                    type: 'GET',
-                    url: '/user/stock/get',
-                    data: {},
+                    type: 'POST',
+                    url: '/user/stock/post2',
+                    data: {user_id_give:$.cookie('user_id')},
                     success: function (response) {
                         let rows = response['result']
                         console.log(rows)
