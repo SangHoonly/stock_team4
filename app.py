@@ -15,10 +15,11 @@ db = client.dbsparta
 def home():
     return render_template('index.html')
 
-  
+
 @app.route('/sign_up')
 def sign_up():
     return render_template('sign_up.html')
+
 
 @app.route("/stock", methods=["POST"])
 def stock_post():
@@ -73,12 +74,14 @@ def stock_post():
     return jsonify({'msg': '저장 완료!'})
 
 
+# 기존 코드 : 주식 DB 조회
 @app.route("/stock", methods=["GET"])
 def stock_get():
     stock_list = list(db.stock.find({}, {'_id': False}))
     return jsonify({'movies': stock_list})
 
 
+# 주식 크롤링
 @app.route("/stock/crawling", methods=["GET"])
 def stock_get_crawl():
     headers = {
@@ -99,7 +102,7 @@ def stock_get_crawl():
         up_down = stock.select_one('td:nth-child(3)').text
         percent = stock.select_one('td:nth-child(4)').text
         code = stock.select_one('th > a')['href'].split('code=')[1]
-        #print(name, price, up_down, percent, code)
+        # print(name, price, up_down, percent, code)
         doc = {
             'stock_name': name,
             'stock_code': code
@@ -109,14 +112,10 @@ def stock_get_crawl():
     return jsonify({'stock': result})
 
 
+# 게스트 메인
 @app.route("/main", methods=["GET"])
 def get():
     return render_template('guest_main.html')
-
-
-@app.route("/user/main", methods=["GET"])
-def user_get():
-    return render_template('user_main.html')
 
 
 @app.route("/sign_up", methods=["POST"])
@@ -125,7 +124,7 @@ def sign_up_post():
     id_give = request.form['id_give']
     password_give = request.form['password_give']
 
-    if user_name_give and id_give and password_give: ## 하나라도 비어있으면 False
+    if user_name_give and id_give and password_give:  ## 하나라도 비어있으면 False
         user_list = list(db.users.find({}, {'_id': False}))
 
         for user in user_list:
@@ -135,14 +134,26 @@ def sign_up_post():
                 return jsonify({'msg': '아이디가 중복되었습니다.', 'state': False})
 
         user_info = {
-            'user_name':user_name_give,
-            'id':id_give,
-            'password':password_give,
+            'user_name': user_name_give,
+            'id': id_give,
+            'password': password_give,
         }
         db.users.insert_one(user_info)
-        return jsonify({'msg':'회원가입 완료.', 'state': True})
+        return jsonify({'msg': '회원가입 완료.', 'state': True})
     else:
-        return jsonify({'msg':'모든 칸을 채워주세요.', 'state': False})
+        return jsonify({'msg': '모든 칸을 채워주세요.', 'state': False})
+
+
+@app.route("/my-main", methods=["GET"])
+def my_main():
+    return render_template("user_main.html")
+
+
+# 주식 DB 조회
+@app.route("/my-stock-list", methods=["GET"])
+def my_stock_list():
+    # 수정하기 - /stock 참고
+    return jsonify({'stock': 'result'})
 
 
 if __name__ == '__main__':
