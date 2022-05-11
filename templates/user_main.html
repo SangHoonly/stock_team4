@@ -87,66 +87,68 @@
         // 정규표현식 끝
 
         function addMyStock() {
-            let company_name = $('#company_name').val()
-            let buy_price = $('#buy_price').val()
-            let buy_date = $('#buy_date').val()
+                let company_name = $('#company_name').val()
+                let buy_price = $('#buy_price').val()
+                let buy_date = $('#buy_date').val()
 
-            if (!company_name || !buy_price || !buy_date) {
-                alert("비어 있는 칸이 있으면 안 됩니다!")
+                if (!company_name || !buy_price || !buy_date) {
+                    alert("비어 있는 칸이 있으면 안 됩니다!")
+                }
+
+                if (!stock_code_company[company_name]){
+                    alert('올바른 회사를 골라주세요.')
+                }else if (!is_price(buy_price)) {
+                    alert("매수가 형식에 맞춰서 작성 해주세요.(ex.1~1000000000)")
+                } else if (!is_date(buy_date)) {
+                    alert("날짜 형식에 맞춰서 작성 해주세요.(ex.2022-05-11)")
+                } else if(Number(buy_price) === 0){
+                    alert("매수 가격은 0원이 될 수 없습니다.")
+                }
+                else{
+                    $.ajax({
+                        type: 'POST',
+                        url: '/favorite',
+                        data: {
+                            code_give: stock_code_company[company_name],
+                            buy_price_give: buy_price,
+                            buy_date_give: buy_date,
+                            user_id_give: $.cookie('user_id')
+                        },
+                        success: function (response) {
+                            alert(response['msg'])
+                            window.location.reload()
+                        }
+                    });
+                }
             }
 
-            if (!stock_code_company[company_name]) {
-                alert('올바른 회사를 골라주세요.')
-            } else if (!is_price(buy_price)) {
-                alert("매수가 형식에 맞춰서 작성 해주세요.(ex.1~1000000000)")
-            } else if (!is_date(buy_date)) {
-                alert("날짜 형식에 맞춰서 작성 해주세요.(ex.2022-05-11)")
-            } else if (Number(buy_price) === 0) {
-                alert("매수 가격은 0원이 될 수 없습니다.")
-            } else {
+
+            function listing() {
                 $.ajax({
                     type: 'POST',
-                    url: '/favorite',
-                    data: {
-                        code_give: stock_code_company[company_name],
-                        buy_price_give: buy_price,
-                        buy_date_give: buy_date,
-                        user_id_give: $.cookie('user_id')
-                    },
+                    url: '/favorites',
+                    data: {user_id_give:$.cookie('user_id')},
                     success: function (response) {
-                        alert(response['msg'])
-                        window.location.reload()
-                    }
-                });
-            }
-        }
+                        let rows = response['result']
 
+                        for (let i = 0; i < rows.length; i++) {
+                            let stock_name = rows[i]['stock_name']
+                            let stock_code = rows[i]['stock_code']
+                            let buy_price = addComma(rows[i]['buy_price'])
+                            let close = rows[i]['close']
+                            let date_delta = rows[i]['date_delta']
+                            let buy_date = rows[i]['buy_date']
+                            let _id = rows[i]['_id']
 
-        function listing() {
-            $.ajax({
-                type: 'POST',
-                url: '/favorites',
-                data: {user_id_give: $.cookie('user_id')},
-                success: function (response) {
-                    let rows = response['result']
+                            let n_close = Number(close.split(",").join(""))
+                            let n_buy_price = Number(buy_price.split(",").join(""))
 
-                    for (let i = 0; i < rows.length; i++) {
-                        let stock_name = rows[i]['stock_name']
-                        let stock_code = rows[i]['stock_code']
-                        let buy_price = addComma(rows[i]['buy_price'])
-                        let close = rows[i]['close']
-                        let date_delta = rows[i]['date_delta']
-                        let buy_date = rows[i]['buy_date']
+                            let temp_html = ``
 
-                        let n_close = Number(close.split(",").join(""))
-                        let n_buy_price = Number(buy_price.split(",").join(""))
-
-                        let temp_html = ``
-
-                        let profit_per = (n_close / n_buy_price * 100).toFixed(2)
-                        let profit_plus = n_close - n_buy_price
-                        if (n_close > n_buy_price) {
-                            temp_html = `
+                            let profit_per = (n_close/n_buy_price*100).toFixed(2)
+                            let profit_plus = n_close-n_buy_price
+                            if (n_close > n_buy_price){
+                                temp_html = `
                                             <div class="card border-danger mb-3" style="width: 30%;">
                                                 <div class="card-header"><b>${stock_name} | ${stock_code}</b> 😍</div>
                                                 <div class="card-body text-danger">
@@ -156,10 +158,13 @@
                                                     <p>매수 일자: ${buy_date}</p>
                                                     <p>${date_delta}일 보유 중</p>
                                                 </div>
+                                                <button id="${_id}" onclick="delete_stock(this)"type="button" class="btn btn-outline-danger">삭제</button>
                                             </div>
                                 `
-                        } else {
-                            temp_html = `
+
+                                console.log(`id up :${_id}`)
+                            }else{
+                                temp_html = `
                                             <div class="card border-primary mb-3" style="width: 30%;">
                                                 <div class="card-header"><b>${stock_name} | ${stock_code}</b> 😱</div>
                                                 <div class="card-body text-primary">
@@ -169,17 +174,39 @@
                                                     <p>매수 일자: ${buy_date}</p>
                                                     <p>${date_delta}일 보유 중</p>
                                                 </div>
+                                                <button id="${_id}" onclick="delete_stock(this)" type="button" class="btn btn-outline-danger">삭제</button>
                                             </div>
                                 `
+
+                                console.log(`id down :${_id}`)
+                            }
+
+                            $('#cards-box').append(temp_html);
                         }
-
-                        $('#cards-box').append(temp_html);
                     }
-                }
-            })
-        }
+                })
+            }
+        
 
-    </script>
+            function delete_stock(obj) {
+                let id = obj.id
+                let mdb_id = id
+                console.log(mdb_id)
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/favorite',
+                    data: {
+                        mdb_id_give: mdb_id
+                    },
+                    success: function (response) {
+                        alert(response['msg'])
+                        window.location.reload()
+                    }
+                });
+
+            }
+
+        </script>
     <style>
         *, button, input {
 
