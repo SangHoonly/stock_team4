@@ -21,5 +21,8 @@ class UserDao:
     def find_user(self, user):
         return self.database.user.find_one(user)
 
+    def delete_user(self, user):
+        return self.database.user.delete_one(user)
+
     # def find_all_user(self, user):
     #     return self.database.user.find(user)
