@@ -9,9 +9,7 @@ from util import get_hash, get_stock_name_by_code
 from bson.objectid import ObjectId
 
 def create_endpoints(app, service):
-    req = request.form
-
-    def is_correct_password():
+    def is_correct_password(req):
         return bool(service.user.find_user({'id': req['id_give'], 'pw': get_hash(req['pw_give'])}))
 
     # Home
@@ -50,7 +48,9 @@ def create_endpoints(app, service):
     # 회원탈퇴
     @app.route('/api/secession', methods=['DELETE'])
     def secession_check():
-        user = {'id': req['id_give'], 'pw': pw_hash}
+        req = request.form
+        user = {'id': req['id_give'], 'pw': req['pw_give']}
+
         if is_correct_password():
             service.user.delete_user(user)
             service.favorite.delete_favorite_many(user)
@@ -67,6 +67,7 @@ def create_endpoints(app, service):
     # register single user
     @app.route('/api/register', methods=['POST'])
     def api_register():
+        req = request.form
         doc = dict(id=req['id_give'], pw=get_hash(req['pw_give']), nick=req['nickname_give'])
 
         return jsonify(dict(result=bool(service.user.insert_user(doc))))
@@ -74,6 +75,7 @@ def create_endpoints(app, service):
     # 아이디 중복체크
     @app.route('/api/check-dup', methods=['POST'])
     def api_check_dup():
+        req = request.form
         doc = dict(id=req['userid_give'])
 
         return jsonify({'result': 'success', 'exists': bool(service.user.find_user(doc))})
@@ -86,9 +88,10 @@ def create_endpoints(app, service):
 
     @app.route('/api/login', methods=['POST'])
     def api_login():
+        req = request.form
         user_id = req['id_give']
 
-        if is_correct_password():
+        if is_correct_password(req):
             payload = {
                 'id': user_id,
                 'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)
@@ -102,6 +105,7 @@ def create_endpoints(app, service):
     # 유저의 관심종목 불러오기
     @app.route("/favorites", methods=["POST"])
     def get_favorites():
+        req = request.form
         doc = {'user_id': req['user_id_give']}
         favorite_stocks = service.favorite.find_favorites(doc)
 
@@ -110,6 +114,7 @@ def create_endpoints(app, service):
     # 유저의 관심종목 등록
     @app.route("/favorite", methods=["POST"])
     def insert_favorite():
+        req = request.form
         doc = {
             'user_id': req['user_id_give'],
             'stock_name': get_stock_name_by_code(req['code_give']),
