@@ -39,6 +39,14 @@ def create_endpoints(app, service):
 
         return jsonify(dict(result=service.user.insert_user(doc)))
 
+    # 아이디 중복체크
+    @app.route('/api/check-dup', methods=['POST'])
+    def api_check_dup():
+        req = request.form
+        doc = dict(id=req['userid_give'])
+        exists = bool(service.user.find_user(doc))
+        return jsonify({'result': 'success', 'exists': exists})
+
 
     # 로그인된 user main page
     @app.route("/user/main", methods=["GET"])
