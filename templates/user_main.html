@@ -25,8 +25,10 @@
                 listing();
             });
 
-            function goMine() {
-                location.href = "/main";
+            function logout() {
+                $.removeCookie('user_id', { path: '/' });
+                $.removeCookie('mytoken', { path: '/' });;
+                location.href = "/";
             }
 
             function addMyStock() {
@@ -141,7 +143,7 @@
             <button type="button" id="myButton" onclick="addMyStock()" class="btn btn-info">관심종목 추가하기</button>
             <button onclick="listing()">임시</button>
         </div>
-        <button type="button" id="logout" onclick="goMine()" class="btn btn-secondary">로그아웃</button>
+        <button type="button" id="logout" onclick="logout()" class="btn btn-secondary">로그아웃</button>
     </div>
 
     <div class="chart-group">
