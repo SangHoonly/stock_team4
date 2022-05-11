@@ -14,6 +14,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
 
         <script>
             $(document).ready(function () {
@@ -25,15 +28,24 @@
                 listing();
             });
 
-            function logout() {
-                $.removeCookie('user_id', { path: '/' });
-                $.removeCookie('mytoken', { path: '/' });;
-                location.href = "/";
-            }
+            let company_list = Array()
+            let stock_code_company = Array()
 
-            $(function () {	//화면 로딩후 시작
-                $("#searchInput").autocomplete({  //오토 컴플릿트 시작
-                    source: List,	// source는 data.js파일 내부의 List 배열
+
+            $(function () { // 화면 로딩 후 시작
+                $.ajax({
+                    url: "../static/company_list.json",
+                    dataType: 'json',
+                    success: function (data) {
+                        let company_json = data
+                        for (let i = 0 ; i < company_json.length; i ++){
+                            company_list[i] = company_json[i]['회사명']
+                            stock_code_company[company_json[i]['회사명']] = company_json[i]['종목코드']
+                        }
+                    }
+                })
+                $("#company_name").autocomplete({  //오토 컴플릿트 시작
+                    source: company_list,	// source는 data.js파일 내부의 List 배열
                     focus: function (event, ui) { // 방향키로 자동완성단어 선택 가능하게 만들어줌
                         return false;
                     },
@@ -43,11 +55,20 @@
                 });
             });
 
-            // 정규표현식 시작
-            function is_stockcode(asValue) {
-                var regExp = /\d{6}/;
-                return regExp.test(asValue);
+
+
+            function logout() {
+                $.removeCookie('user_id', { path: '/' });
+                $.removeCookie('mytoken', { path: '/' });;
+                location.href = "/";
             }
+
+
+            // 정규표현식 시작
+            // function is_stockcode(asValue) {
+            //     var regExp = /\d{6}/;
+            //     return regExp.test(asValue);
+            // }
 
             function is_price(asValue) {
                 var regExp = /\d{1,10}/;
@@ -66,17 +87,17 @@
             // 정규표현식 끝
 
             function addMyStock() {
-                let code = $('#code').val()
+                let company_name = $('#company_name').val()
                 let buy_price = $('#buy_price').val()
                 let buy_date = $('#buy_date').val()
 
-                if (!code || !buy_price || !buy_date) {
+                if (!company_name || !buy_price || !buy_date) {
                     alert("비어 있는 칸이 있으면 안 됩니다!")
                 }
 
-                if (!is_stockcode(code)) {
-                    alert("종목 코드 형식에 맞춰서 작성 해주세요.(ex.005930)")
-                } else if (!is_price(buy_price)) {
+                if (!stock_code_company[company_name]){
+                    alert('올바른 회사를 골라주세요.')
+                }else if (!is_price(buy_price)) {
                     alert("매수가 형식에 맞춰서 작성 해주세요.(ex.1~1000000000)")
                 } else if (!is_date(buy_date)) {
                     alert("날짜 형식에 맞춰서 작성 해주세요.(ex.2022-05-11)")
@@ -88,7 +109,7 @@
                         type: 'POST',
                         url: '/favorite',
                         data: {
-                            code_give: code,
+                            code_give: stock_code_company[company_name],
                             buy_price_give: buy_price,
                             buy_date_give: buy_date,
                             user_id_give: $.cookie('user_id')
@@ -118,11 +139,14 @@
                             let date_delta = rows[i]['date_delta']
                             let buy_date = rows[i]['buy_date']
 
+                            let n_close = Number(close.split(",").join(""))
+                            let n_buy_price = Number(buy_price.split(",").join(""))
+
                             let temp_html = ``
 
-                            let profit_per = (Number(close.split(",").join(""))/Number(buy_price.split(",").join(""))*100).toFixed(2)
-                            let profit_plus = Number(close.split(",").join(""))-Number(buy_price.split(",").join(""))
-                            if (close > buy_price){
+                            let profit_per = (n_close/n_buy_price*100).toFixed(2)
+                            let profit_plus = n_close-n_buy_price
+                            if (n_close > n_buy_price){
                                 temp_html = `
                                             <div class="card border-danger mb-3" style="max-width: 18rem;">
                                                 <div class="card-header">${stock_name} | ${stock_code}</div>
@@ -208,8 +232,8 @@
     <h1 class="h1">실시간 인기 주식</h1>
     <div id="my-button-group" class="button-group">
         <div>
-            <label for="code">종목코드: </label>
-            <input id="code" type="text">
+            <label for="company_name">회사명: </label>
+            <input id="company_name" type="text">
             <label for="buy_price">매수가: </label>
             <input id="buy_price" type="text">
             <label for="buy_date">매수날짜: (형식:2022-05-10)</label>
