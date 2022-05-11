@@ -173,7 +173,8 @@ def create_endpoints(app, service):
                 'buy_price': stock['buy_price'],
                 'close': close,
                 'date_delta': date_delta,
-                'buy_date': str(stock['buy_date'])[:10]
+                'buy_date': str(stock['buy_date'])[:10],
+                '_id': stock['_id']
             }
             result.append(temp_doc)
 
@@ -212,4 +213,8 @@ def create_endpoints(app, service):
 
         return jsonify({'msg': '저장 완료!'})
 
-    return
+    # 관심 종목 삭제
+    @app.route("/favorite", methods=["DELETE"])
+    def delete_favorite():
+
+        return

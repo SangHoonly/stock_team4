@@ -138,6 +138,7 @@
                             let close = rows[i]['close']
                             let date_delta = rows[i]['date_delta']
                             let buy_date = rows[i]['buy_date']
+                            let _id = rows[i]['_id']
 
                             let n_close = Number(close.split(",").join(""))
                             let n_buy_price = Number(buy_price.split(",").join(""))
@@ -157,6 +158,7 @@
                                                     <p>매수 일자: ${buy_date}</p>
                                                     <p>${date_delta}일 보유 중</p>
                                                 </div>
+                                                <button onclick="delete_stock({_id})" type="button" class="btn btn-outline-danger">삭제</button>
                                             </div>
                                 `
                             }else{
@@ -170,6 +172,7 @@
                                                     <p>매수 일자: ${buy_date}</p>
                                                     <p>${date_delta}일 보유 중</p>
                                                 </div>
+                                                <button onclick="delete_stock({_id})" type="button" class="btn btn-outline-danger">삭제</button>
                                             </div>
                                 `
                             }
@@ -178,6 +181,22 @@
                         }
                     }
                 })
+            }
+
+            function delete_stock(_id) {
+                let mdb_id = _id
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/favorite',
+                    data: {
+                        mdb_id_give: mdb_id
+                    },
+                    success: function (response) {
+                        alert(response['msg'])
+                        window.location.reload()
+                    }
+                });
+
             }
 
         </script>
