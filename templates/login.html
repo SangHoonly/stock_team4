@@ -9,17 +9,32 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <!-- google font link -->
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+
     <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
+    <style>
+        *, button, input {
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        body {
+            background-color: #FFFDF9;
+        }
+    </style>
 
     <script>
-        {% if msg %}
-            alert("{{ msg }}")
-        {% endif %}
+        {%
+            if msg %}
+        alert("{{ msg }}")
+        {%
+            endif %
+        }
         // ['쿠키'라는 개념에 대해 알아봅시다]
         // 로그인을 구현하면, 반드시 쿠키라는 개념을 사용합니다.
         // 페이지에 관계없이 브라우저에 임시로 저장되는 정보입니다. 키:밸류 형태(딕셔너리 형태)로 저장됩니다.
@@ -59,7 +74,15 @@
             });
         }
     </script>
+    <style>
+        *, button {
+            font-family: 'Gowun Dodum', sans-serif;
+        }
 
+        body {
+            background-color: #FFFDF9;
+        }
+    </style>
 </head>
 <body>
 <section class="hero is-fullheight" style="background: #FFFDF9;">

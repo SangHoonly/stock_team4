@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>마이페이지</title>
 
+    <!-- google font link -->
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
     <!-- Bulma CSS 링크 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
     <script>
         let id = `{{id}}`
 
@@ -35,8 +38,9 @@
                             success: function (response) {
                                 if (response['result'] == 'success') {
                                     alert(response['msg'])
-                                    $.removeCookie('user_id', { path: '/' });
-                                    $.removeCookie('mytoken', { path: '/' });;
+                                    $.removeCookie('user_id', {path: '/'});
+                                    $.removeCookie('mytoken', {path: '/'});
+                                    ;
                                     location.href = "/"
                                 } else {
                                     alert(response['msg'])
@@ -50,6 +54,15 @@
             });
         }
     </script>
+    <style>
+        * ,button, input{
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        body {
+            background-color: #FFFDF9;
+        }
+    </style>
 </head>
 <body>
 <section class="hero is-fullheight" style="background: #FFFDF9;">
