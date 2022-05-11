@@ -258,7 +258,7 @@
         <div class="newInfo">
             <div class="form-floating mb-3" style="width:230px">
                 <input type="text" class="form-control" id="company_name" placeholder="종목코드">
-                <label for="company_name">주식 코드</label>
+                <label for="company_name">회사명</label>
             </div>
             <div class="form-floating mb-3" style="width:230px">
                 <input type="text" class="form-control" id="buy_price" placeholder="매수가">
@@ -272,6 +272,7 @@
             </button>
         </div>
         <div id="my-button-group" class="button-group">
+            <button type="button" id="logout" onclick="location.href='/my_page'" class="btn btn-warning">마이페이지</button>
             <button type="button" id="logout" onclick="logout()" class="btn btn-secondary">로그아웃</button>
         </div>
     </div>
