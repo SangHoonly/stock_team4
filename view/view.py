@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from flask import render_template, jsonify, request, redirect, url_for
 from config import config
 from util import get_hash
-
+from bson.objectid import ObjectId
 
 def create_endpoints(app, service):
     JWT_SECRET_KEY = config.JWT_config.SECRET_KEY
@@ -62,7 +62,10 @@ def create_endpoints(app, service):
         pw_hash = get_hash(req['pw_give'])
         user = {'id': req['id_give'], 'pw': pw_hash}
         if service.user.delete_user(user):
-            return jsonify({'result': 'success', 'msg': '탈퇴 완료'})
+            user = {'user_id': req['id_give']}
+            if service.favorite.delete_favorite_many(user):
+                return jsonify({'result': 'success', 'msg': '탈퇴 완료'})
+            return jsonify({'result': 'fail', 'msg': '탈퇴 실패'})
         return jsonify({'result': 'fail', 'msg': '탈퇴 실패'})
 
     # stock crawling
@@ -139,7 +142,7 @@ def create_endpoints(app, service):
 
         user_id_receive = request.form['user_id_give']
 
-        doc = ({'user_id': user_id_receive}, {'_id': False})
+        doc = ({'user_id': user_id_receive})
 
         stock_list = list(service.favorite.find_favorites(doc))
 
@@ -168,7 +171,8 @@ def create_endpoints(app, service):
                 'buy_price': stock['buy_price'],
                 'close': close,
                 'date_delta': date_delta,
-                'buy_date': str(stock['buy_date'])[:10]
+                'buy_date': str(stock['buy_date'])[:10],
+                '_id': str(stock['_id'])
             }
             result.append(temp_doc)
 
@@ -192,7 +196,6 @@ def create_endpoints(app, service):
 
         stock_name = soup.select_one('#middle > div.h_company > div.wrap_company > h2 > a').text
 
-        a = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
         doc = {
             'user_id': user_id_receive,
             'stock_name': stock_name,
@@ -206,4 +209,15 @@ def create_endpoints(app, service):
 
         return jsonify({'msg': '저장 완료!'})
 
-    return
+    # 관심 종목 삭제
+    @app.route("/favorite", methods=["DELETE"])
+    def delete_favorite():
+        mdb_id_receive = request.form['mdb_id_give']
+
+        doc = {
+            '_id':ObjectId(mdb_id_receive)
+        }
+
+        service.favorite.delete_favorite(doc)
+
+        return jsonify({'msg': '삭제 성공!'})
