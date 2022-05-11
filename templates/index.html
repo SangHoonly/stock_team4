@@ -49,38 +49,6 @@
         }
 
     </style>
-    <script>
-        $(document).ready(function () {
-            listing();
-        });
-
-        function listing() {
-            $.ajax({
-                type: 'GET',
-                url: '/stock/crawling',
-                data: {},
-                success: function (response) {
-                    let rows = response['stock']
-                    console.log(rows)
-                    for (let i = 0; i < 4; i++) {
-                        let stock_name = rows[i]['stock_name']
-                        let stock_code = rows[i]['stock_code']
-                        let temp_html =
-                            `<div class="col_up">
-                                        <div class="card h-100">
-                                            <div class="card-body" id="${stock_code}">
-                                                <h5 class="card-title" style="color: black">${stock_name}</h5>
-                                                <img  src="https://ssl.pstatic.net/imgfinance/chart/item/candle/day/${stock_code}.png?sidcode=1651320112515"></img>
-                                            </div>
-                                        </div>
-                                    </div>`
-                        console.log(stock_name, temp_html);
-                        $('#cards-box').append(temp_html);
-                    }
-                }
-            })
-        }
-    </script>
 </head>
 
 <body>
@@ -89,6 +57,16 @@
 
 <div class="chart-group">
     <div class="row row-cols-1 row-cols-md-2 g-2" id="cards-box">
+          {% for i in range(4) %}
+            <div class="col_up">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title" style="color: black">{{ stock[i].stock_name }}</h5>
+                        <img src="https://ssl.pstatic.net/imgfinance/chart/item/candle/day/{{ stock[i].stock_code }}.png?sidcode=1651320112515"></img>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 </div>
 </body>
