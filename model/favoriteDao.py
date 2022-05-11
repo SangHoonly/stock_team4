@@ -15,4 +15,7 @@ class FavoriteDao:
         return True
 
     def find_favorites(self, doc):
-        return self.database.favorites.find(*doc)
+        return self.database.favorites.find(doc)
+
+    def delete_favorite(self, doc):
+        return self.database.favorites.delete_one(doc)

@@ -9,3 +9,6 @@ class FavoriteService:
 
     def find_favorites(self, doc):
         return self.favorite_dao.find_favorites(doc)
+
+    def delete_favorite(self, doc):
+        return self.favorite_dao.delete_favorite(doc)
