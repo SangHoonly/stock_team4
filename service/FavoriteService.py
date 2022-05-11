@@ -23,3 +23,9 @@ class FavoriteService:
             'date_delta': (datetime.now() - stock['buy_date']).days + 1,
             'buy_date': str(stock['buy_date'])[:10]
         } for stock in favorite_stocks]
+
+    def delete_favorite(self, doc):
+        return self.favorite_dao.delete_favorite(doc)
+
+    def delete_favorite_many(self, doc):
+        return self.favorite_dao.delete_favorite_many(doc)

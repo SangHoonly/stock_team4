@@ -138,6 +138,7 @@
                             let close = rows[i]['close']
                             let date_delta = rows[i]['date_delta']
                             let buy_date = rows[i]['buy_date']
+                            let _id = rows[i]['_id']
 
                             let n_close = Number(close.split(",").join(""))
                             let n_buy_price = Number(buy_price.split(",").join(""))
@@ -157,8 +158,11 @@
                                                     <p>매수 일자: ${buy_date}</p>
                                                     <p>${date_delta}일 보유 중</p>
                                                 </div>
+                                                <button id="${_id}" onclick="delete_stock(this)"type="button" class="btn btn-outline-danger">삭제</button>
                                             </div>
                                 `
+
+                                console.log(`id up :${_id}`)
                             }else{
                                 temp_html = `
                                             <div class="card border-primary mb-3" style="max-width: 18rem;">
@@ -170,8 +174,11 @@
                                                     <p>매수 일자: ${buy_date}</p>
                                                     <p>${date_delta}일 보유 중</p>
                                                 </div>
+                                                <button id="${_id}" onclick="delete_stock(this)" type="button" class="btn btn-outline-danger">삭제</button>
                                             </div>
                                 `
+
+                                console.log(`id down :${_id}`)
                             }
 
                             $('#cards-box').append(temp_html);
@@ -180,72 +187,123 @@
                 })
             }
 
+            function delete_stock(obj) {
+                let id = obj.id
+                let mdb_id = id
+                console.log(mdb_id)
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/favorite',
+                    data: {
+                        mdb_id_give: mdb_id
+                    },
+                    success: function (response) {
+                        alert(response['msg'])
+                        window.location.reload()
+                    }
+                });
+
+            }
+
         </script>
-
-        <style>
-            * {
-                font-family: 'Gowun Dodum', sans-serif;
-            }
-
-            .chart-group {
-                width: 100%;
-                height: 40%;
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
-            }
+    <style>
+        *, button, input {
+            font-family: 'Gowun Dodum', sans-serif;
+        }
 
 
-            .h1 {
-                margin: 30px 30px 50px 30px;
-                padding: 5px;
-                text-align: center;
-            }
+        .chart-group {
+            width: 100%;
+            height: 40%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
 
-            #myButton {
-                color: blue;
-                font-family: 'Gowun Dodum', sans-serif;
-            }
 
-            #logout {
-                margin-top: 10px;
-                margin-bottom: 20px;
-                font-family: 'Gowun Dodum', sans-serif;
-            }
+        .h1 {
+            margin: 30px 30px 50px 30px;
+            padding: 5px;
+            text-align: center;
+        }
 
-            .button-group {
-                margin-right: 20px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: end;
-            }
+        #myButton {
+            font-family: 'Gowun Dodum', sans-serif;
+        }
 
-            .card {
-                margin: 5px;
-            }
-        </style>
+        #logout {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        .button-group {
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: end;
+        }
+
+        .card {
+            margin: 5px;
+        }
+
+        .newInfo {
+            border: 3px solid darkgray;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 1100px;
+            margin: 10px auto 10px auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .twoGroup {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-floating {
+            margin: 10px;
+        }
+
+    </style>
     </head>
 
     <body>
-    <h1 class="h1">실시간 인기 주식</h1>
-    <div id="my-button-group" class="button-group">
-        <div>
-            <label for="company_name">회사명: </label>
-            <input id="company_name" type="text">
-            <label for="buy_price">매수가: </label>
-            <input id="buy_price" type="text">
-            <label for="buy_date">매수날짜: (형식:2022-05-10)</label>
-            <input id="buy_date" type="text">
-            <button type="button" id="myButton" onclick="addMyStock()" class="btn btn-info">관심종목 추가하기</button>
+    <h1 class="h1">나의 주식</h1>
+    <div class="twoGroup">
+        <div class="newInfo">
+            <div class="form-floating mb-3" style="width:230px">
+                <input type="text" class="form-control" id="company_name" placeholder="종목코드">
+                <label for="company_name">회사명</label>
+            </div>
+            <div class="form-floating mb-3" style="width:230px">
+                <input type="text" class="form-control" id="buy_price" placeholder="매수가">
+                <label for="buy_price">매수가</label>
+            </div>
+            <div class="form-floating mb-3" style="width:230px">
+                <input type="text" class="form-control" id="buy_date" placeholder="매수날짜">
+                <label for="buy_date">매수 날짜) 2022-05-10 형식</label>
+            </div>
+            <button type="button" id="myButton" onclick="addMyStock()" class="btn btn-outline-secondary btn-lg">관심종목 추가하기
+            </button>
         </div>
-        <button type="button" id="logout" onclick="logout()" class="btn btn-secondary">로그아웃</button>
+        <div id="my-button-group" class="button-group">
+            <button type="button" id="logout" onclick="location.href='/my_page'" class="btn btn-warning">마이페이지</button>
+            <button type="button" id="logout" onclick="logout()" class="btn btn-secondary">로그아웃</button>
+        </div>
     </div>
 
-    <div class="chart-group">
+    <div class="chart-group" style="margin-top : 20px">
         <div class="row row-cols-1 row-cols-md-3 g-1" id="cards-box">
-
         </div>
     </div>
 

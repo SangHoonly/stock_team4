@@ -21,3 +21,7 @@ E반 4조의 첫번째 프로젝트!
   <!-- ### Usage -->
 
 
+###  __Stacks__ 📚
+
+<img src="https://img.shields.io/badge/flask-000000?style=for-the-badge&logo=FLASK&logoColor=white"/><img src="https://img.shields.io/badge/Jinja-B41717?style=for-the-badge&logo=Jinja&logoColor=white]"/><img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=Jinja&logoColor=white]"/><img src="https://img.shields.io/badge/Sourcetree-0052CC?style=for-the-badge&logo=Sourcetree&logoColor=white]"/>
+

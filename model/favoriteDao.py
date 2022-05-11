@@ -9,3 +9,9 @@ class FavoriteDao:
 
     def find_favorites(self, doc):
         return self.database.favorites.find(doc)
+
+    def delete_favorite(self, doc):
+        return self.database.favorites.delete_one(doc)
+
+    def delete_favorite_many(self, doc):
+        return self.database.favorites.delete_many(doc)

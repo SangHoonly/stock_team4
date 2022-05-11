@@ -6,7 +6,7 @@ from flask import render_template, jsonify, request
 from aop.Aop import login_required
 from config import config
 from util import get_hash, get_stock_name_by_code
-
+from bson.objectid import ObjectId
 
 def create_endpoints(app, service):
     req = request.form
@@ -17,7 +17,8 @@ def create_endpoints(app, service):
     # Home
     @app.route("/", methods=["GET"])
     def home():
-        return render_template('index.html')
+        info = service.stock.get_crawling()
+        return render_template('index.html', stock=info)
 
     # Rendering Log in Page
     @app.route("/login", methods=["GET"])
@@ -47,10 +48,13 @@ def create_endpoints(app, service):
 
 
     # 회원탈퇴
-    @app.route('/api/secession', methods=['POST'])
+    @app.route('/api/secession', methods=['DELETE'])
     def secession_check():
+        user = {'id': req['id_give'], 'pw': pw_hash}
         if is_correct_password():
-            service.user.delete_user({'id': req['id_give'], 'pw': get_hash(req['pw_give'])})
+            service.user.delete_user(user)
+            service.favorite.delete_favorite_many(user)
+            
             return jsonify({'result': 'success', 'msg': '탈퇴 완료'})
 
         return jsonify({'result': 'fail', 'msg': '탈퇴 실패'})
@@ -74,13 +78,11 @@ def create_endpoints(app, service):
 
         return jsonify({'result': 'success', 'exists': bool(service.user.find_user(doc))})
 
-
     # 로그인된 user main page
     @app.route("/user/main", methods=["GET"])
     @login_required
     def user_main(payload):
         return render_template('user_main.html', nickname=service.user.find_user({"id": payload['id']})["nick"])
-
 
     @app.route('/api/login', methods=['POST'])
     def api_login():
@@ -97,7 +99,6 @@ def create_endpoints(app, service):
 
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
-
     # 유저의 관심종목 불러오기
     @app.route("/favorites", methods=["POST"])
     def get_favorites():
@@ -105,7 +106,6 @@ def create_endpoints(app, service):
         favorite_stocks = service.favorite.find_favorites(doc)
 
         return jsonify({'result': favorite_stocks})
-
 
     # 유저의 관심종목 등록
     @app.route("/favorite", methods=["POST"])
@@ -123,4 +123,15 @@ def create_endpoints(app, service):
 
         return jsonify({'msg': '저장 완료!'})
 
-    return
+    # 관심 종목 삭제
+    @app.route("/favorite", methods=["DELETE"])
+    def delete_favorite():
+        mdb_id_receive = request.form['mdb_id_give']
+
+        doc = {
+            '_id':ObjectId(mdb_id_receive)
+        }
+
+        service.favorite.delete_favorite(doc)
+
+        return jsonify({'msg': '삭제 성공!'})
