@@ -14,7 +14,8 @@ def create_endpoints(app, service):
     # Home
     @app.route("/", methods=["GET"])
     def home():
-        return render_template('index.html')
+        info = service.stock.get_crawling()
+        return render_template('index.html', stock=info)
 
     # Rendering Log in Page
     @app.route("/login", methods=["GET"])
@@ -86,7 +87,6 @@ def create_endpoints(app, service):
         exists = bool(service.user.find_user(doc))
         return jsonify({'result': 'success', 'exists': exists})
 
-
     # 로그인된 user main page
     @app.route("/user/main", methods=["GET"])
     def user_main():
@@ -101,7 +101,6 @@ def create_endpoints(app, service):
             return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
         return render_template('user_main.html', nickname=service.user.find_user({"id": payload['id']})["nick"])
-
 
     @app.route('/api/login', methods=['POST'])
     def api_login():
@@ -121,7 +120,6 @@ def create_endpoints(app, service):
 
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
-
     @app.route('/api/nick', methods=['GET'])
     def api_valid():
         token_receive = request.cookies.get('mytoken')
@@ -135,8 +133,6 @@ def create_endpoints(app, service):
             return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
         except jwt.exceptions.DecodeError:
             return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
-
-
 
     # 유저의 관심종목 불러오기
     @app.route("/favorites", methods=["POST"])
@@ -178,7 +174,6 @@ def create_endpoints(app, service):
             result.append(temp_doc)
 
         return jsonify({'result': result})
-
 
     # 유저의 관심종목 등록
     @app.route("/favorite", methods=["POST"])
