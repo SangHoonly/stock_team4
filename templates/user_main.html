@@ -1,69 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <title>메인 페이지</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head>
+    <meta charset="UTF-8">
+    <title>메인 페이지</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-              integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-                integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-                crossorigin="anonymous"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
 
-
-        <script>
-            $(document).ready(function () {
-                let user_id = $.cookie('user_id')
-                temp_html = `
+    <script>
+        $(document).ready(function () {
+            let user_id = $.cookie('user_id')
+            temp_html = `
                 <h3>${user_id}님 안녕하세요!</h3>
             `
-                $('#my-button-group').prepend(temp_html)
-                listing();
+            $('#my-button-group').prepend(temp_html)
+            listing();
+        });
+
+        function logout() {
+            $.removeCookie('user_id', {path: '/'});
+            $.removeCookie('mytoken', {path: '/'});
+            ;
+            location.href = "/";
+        }
+
+        function addMyStock() {
+            let code = $('#code').val()
+            let buy_price = $('#buy_price').val()
+            let buy_date = $('#buy_date').val()
+
+            $.ajax({
+                type: 'POST',
+                url: '/favorite',
+                data: {
+                    code_give: code,
+                    buy_price_give: buy_price,
+                    buy_date_give: buy_date,
+                    user_id_give: $.cookie('user_id')
+                },
+                success: function (response) {
+                    alert(response['msg'])
+                    window.location.reload()
+                }
             });
+        }
 
-            function logout() {
-                $.removeCookie('user_id', { path: '/' });
-                $.removeCookie('mytoken', { path: '/' });;
-                location.href = "/";
-            }
+        function listing() {
+            $.ajax({
+                type: 'POST',
+                url: '/favorites',
+                data: {user_id_give: $.cookie('user_id')},
+                success: function (response) {
+                    let rows = response['result']
 
-            function addMyStock() {
-                let code = $('#code').val()
-                let buy_price = $('#buy_price').val()
-                let buy_date = $('#buy_date').val()
+                    for (let i = 0; i < rows.length; i++) {
+                        let stock_name = rows[i]['stock_name']
+                        let stock_code = rows[i]['stock_code']
+                        let buy_price = rows[i]['buy_price']
+                        let close = rows[i]['close']
+                        let date_delta = rows[i]['date_delta']
 
-                $.ajax({
-                    type: 'POST',
-                    url: '/favorite',
-                    data: {code_give: code, buy_price_give: buy_price, buy_date_give: buy_date,user_id_give:$.cookie('user_id')},
-                    success: function (response) {
-                        alert(response['msg'])
-                        window.location.reload()
-                    }
-                });
-            }
-
-            function listing() {
-                $.ajax({
-                    type: 'POST',
-                    url: '/favorites',
-                    data: {user_id_give:$.cookie('user_id')},
-                    success: function (response) {
-                        let rows = response['result']
-
-                        for (let i = 0; i < rows.length; i++) {
-                            let stock_name = rows[i]['stock_name']
-                            let stock_code = rows[i]['stock_code']
-                            let buy_price = rows[i]['buy_price']
-                            let close = rows[i]['close']
-                            let date_delta = rows[i]['date_delta']
-
-                            let temp_html =
-                                `<div class="col_up">
+                        let temp_html =
+                            `<div class="col_up">
                                     <div class="card h-100">
                                         <div class="card-body"">
                                             <h5 class="card-title">${stock_name}</h5>
@@ -75,82 +81,103 @@
                                     </div>
                                 </div>`
 
-                            $('#cards-box').append(temp_html);
-                        }
+                        $('#cards-box').append(temp_html);
                     }
-                })
-            }
+                }
+            })
+        }
 
-        </script>
+    </script>
 
-        <style>
-            * {
-                font-family: 'Gowun Dodum', sans-serif;
-            }
+    <style>
+        *, button, input {
+            font-family: 'Gowun Dodum', sans-serif;
+        }
 
-            .chart-group {
-                width: 100%;
-                height: 40%;
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
-            }
+        .chart-group {
+            width: 100%;
+            height: 40%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
 
-            .chart {
-                width: 500px;
-                height: 400px;
-                background-color: yellowgreen;
-            }
+        .h1 {
+            margin: 30px 30px 50px 30px;
+            padding: 5px;
+            text-align: center;
+        }
 
-            .h1 {
-                margin: 30px 30px 50px 30px;
-                padding: 5px;
-                text-align: center;
-            }
 
-            #myButton {
-                color: blue;
-                font-family: 'Gowun Dodum', sans-serif;
-            }
+        #logout {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-family: 'Gowun Dodum', sans-serif;
+        }
 
-            #logout {
-                margin-top: 10px;
-                margin-bottom: 20px;
-                font-family: 'Gowun Dodum', sans-serif;
-            }
+        .button-group {
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: end;
+        }
 
-            .button-group {
-                margin-right: 20px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: end;
-            }
-        </style>
-    </head>
+        .newInfo {
+            border: 3px solid darkgray;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 1100px;
+            margin: 10px auto 10px auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
 
-    <body>
-    <h1 class="h1">실시간 인기 주식</h1>
+        .twoGroup {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-floating{
+             margin : 10px;
+        }
+    </style>
+</head>
+
+<body>
+<h1 class="h1">실시간 인기 주식</h1>
+<div class="twoGroup">
+    <div class="newInfo">
+        <div class="form-floating mb-3" style="width:230px">
+            <input type="text" class="form-control" id="code" placeholder="종목코드">
+            <label for="code">주식 코드</label>
+        </div>
+        <div class="form-floating mb-3" style="width:230px">
+            <input type="text" class="form-control" id="buy_price" placeholder="매수가">
+            <label for="buy_price">매수가</label>
+        </div>
+        <div class="form-floating mb-3" style="width:230px">
+            <input type="text" class="form-control" id="buy_date" placeholder="매수날짜">
+            <label for="buy_date">매수 날짜) 2022-05-10 형식</label>
+        </div>
+        <button class="btn btn-outline-secondary btn-lg" onclick="addMyStock()" type="button">등록</button>
+    </div>
     <div id="my-button-group" class="button-group">
-        <div>
-            <label for="code">종목코드: </label>
-            <input id="code" type="text">
-            <label for="buy_price">매수가: </label>
-            <input id="buy_price" type="text">
-            <label for="buy_date">매수날짜: (형식:2022-05-10)</label>
-            <input id="buy_date" type="text">
-            <button type="button" id="myButton" onclick="addMyStock()" class="btn btn-info">관심종목 추가하기</button>
-            <button onclick="listing()">임시</button>
-        </div>
-        <button type="button" id="logout" onclick="logout()" class="btn btn-secondary">로그아웃</button>
+        <button class="btn btn-dark btn-lg" id="logout" onclick="logout()" type="button">로그아웃</button>
     </div>
 
-    <div class="chart-group">
-        <div class="row row-cols-1 row-cols-md-2 g-1" id="cards-box">
+</div>
+<div class="chart-group">
+    <div class="row row-cols-1 row-cols-md-2 g-1" id="cards-box">
 
-        </div>
     </div>
-    </body>
+</div>
+</body>
 
 </html>
