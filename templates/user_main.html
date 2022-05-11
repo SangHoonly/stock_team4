@@ -1,155 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <title>메인 페이지</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head>
+    <meta charset="UTF-8">
+    <title>메인 페이지</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-              integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-                integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-                crossorigin="anonymous"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
-
-        <script>
-            $(document).ready(function () {
-                let user_id = $.cookie('user_id')
-                temp_html = `
-                <h3>${user_id}님 안녕하세요!</h3>
+    <script>
+        $(document).ready(function () {
+            let user_id = $.cookie('user_id')
+            temp_html = `
+                <h3>${user_id}님 안녕하세요! 😉</h3>
             `
-                $('#my-button-group').prepend(temp_html)
-                listing();
-            });
+            $('#my-button-group').prepend(temp_html)
+            listing();
+        });
 
-            let company_list = Array()
-            let stock_code_company = Array()
+        let company_list = Array()
+        let stock_code_company = Array()
 
 
-            $(function () { // 화면 로딩 후 시작
-                $.ajax({
-                    url: "../static/company_list.json",
-                    dataType: 'json',
-                    success: function (data) {
-                        let company_json = data
-                        for (let i = 0 ; i < company_json.length; i ++){
-                            company_list[i] = company_json[i]['회사명']
-                            stock_code_company[company_json[i]['회사명']] = company_json[i]['종목코드']
-                        }
+        $(function () { // 화면 로딩 후 시작
+            $.ajax({
+                url: "../static/company_list.json",
+                dataType: 'json',
+                success: function (data) {
+                    let company_json = data
+                    for (let i = 0; i < company_json.length; i++) {
+                        company_list[i] = company_json[i]['회사명']
+                        stock_code_company[company_json[i]['회사명']] = company_json[i]['종목코드']
                     }
-                })
-                $("#company_name").autocomplete({  //오토 컴플릿트 시작
-                    source: company_list,	// source는 data.js파일 내부의 List 배열
-                    focus: function (event, ui) { // 방향키로 자동완성단어 선택 가능하게 만들어줌
-                        return false;
-                    },
-                    minLength: 1,// 최소 글자수
-                    delay: 100,	//autocomplete 딜레이 시간(ms)
-                    //disabled: true, //자동완성 기능 끄기
-                });
+                }
+            })
+            $("#company_name").autocomplete({  //오토 컴플릿트 시작
+                source: company_list,	// source는 data.js파일 내부의 List 배열
+                focus: function (event, ui) { // 방향키로 자동완성단어 선택 가능하게 만들어줌
+                    return false;
+                },
+                minLength: 1,// 최소 글자수
+                delay: 100,	//autocomplete 딜레이 시간(ms)
+                //disabled: true, //자동완성 기능 끄기
             });
+        });
 
 
+        function logout() {
+            $.removeCookie('user_id', {path: '/'});
+            $.removeCookie('mytoken', {path: '/'});
+            ;
+            location.href = "/";
+        }
 
-            function logout() {
-                $.removeCookie('user_id', { path: '/' });
-                $.removeCookie('mytoken', { path: '/' });;
-                location.href = "/";
+
+        // 정규표현식 시작
+        // function is_stockcode(asValue) {
+        //     var regExp = /\d{6}/;
+        //     return regExp.test(asValue);
+        // }
+
+        function is_price(asValue) {
+            var regExp = /\d{1,10}/;
+            return regExp.test(asValue);
+        }
+
+        function is_date(asValue) {
+            var regExp = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/;
+            return regExp.test(asValue);
+        }
+
+        function addComma(value) {
+            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return value;
+        }
+
+        // 정규표현식 끝
+
+        function addMyStock() {
+            let company_name = $('#company_name').val()
+            let buy_price = $('#buy_price').val()
+            let buy_date = $('#buy_date').val()
+
+            if (!company_name || !buy_price || !buy_date) {
+                alert("비어 있는 칸이 있으면 안 됩니다!")
             }
 
-
-            // 정규표현식 시작
-            // function is_stockcode(asValue) {
-            //     var regExp = /\d{6}/;
-            //     return regExp.test(asValue);
-            // }
-
-            function is_price(asValue) {
-                var regExp = /\d{1,10}/;
-                return regExp.test(asValue);
-            }
-
-            function is_date(asValue) {
-                var regExp = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/;
-                return regExp.test(asValue);
-            }
-
-            function addComma(value){
-                value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                return value;
-            }
-            // 정규표현식 끝
-
-            function addMyStock() {
-                let company_name = $('#company_name').val()
-                let buy_price = $('#buy_price').val()
-                let buy_date = $('#buy_date').val()
-
-                if (!company_name || !buy_price || !buy_date) {
-                    alert("비어 있는 칸이 있으면 안 됩니다!")
-                }
-
-                if (!stock_code_company[company_name]){
-                    alert('올바른 회사를 골라주세요.')
-                }else if (!is_price(buy_price)) {
-                    alert("매수가 형식에 맞춰서 작성 해주세요.(ex.1~1000000000)")
-                } else if (!is_date(buy_date)) {
-                    alert("날짜 형식에 맞춰서 작성 해주세요.(ex.2022-05-11)")
-                } else if(Number(buy_price) === 0){
-                    alert("매수 가격은 0원이 될 수 없습니다.")
-                }
-                else{
-                    $.ajax({
-                        type: 'POST',
-                        url: '/favorite',
-                        data: {
-                            code_give: stock_code_company[company_name],
-                            buy_price_give: buy_price,
-                            buy_date_give: buy_date,
-                            user_id_give: $.cookie('user_id')
-                        },
-                        success: function (response) {
-                            alert(response['msg'])
-                            window.location.reload()
-                        }
-                    });
-                }
-            }
-
-
-            function listing() {
+            if (!stock_code_company[company_name]) {
+                alert('올바른 회사를 골라주세요.')
+            } else if (!is_price(buy_price)) {
+                alert("매수가 형식에 맞춰서 작성 해주세요.(ex.1~1000000000)")
+            } else if (!is_date(buy_date)) {
+                alert("날짜 형식에 맞춰서 작성 해주세요.(ex.2022-05-11)")
+            } else if (Number(buy_price) === 0) {
+                alert("매수 가격은 0원이 될 수 없습니다.")
+            } else {
                 $.ajax({
                     type: 'POST',
-                    url: '/favorites',
-                    data: {user_id_give:$.cookie('user_id')},
+                    url: '/favorite',
+                    data: {
+                        code_give: stock_code_company[company_name],
+                        buy_price_give: buy_price,
+                        buy_date_give: buy_date,
+                        user_id_give: $.cookie('user_id')
+                    },
                     success: function (response) {
-                        let rows = response['result']
+                        alert(response['msg'])
+                        window.location.reload()
+                    }
+                });
+            }
+        }
 
-                        for (let i = 0; i < rows.length; i++) {
-                            let stock_name = rows[i]['stock_name']
-                            let stock_code = rows[i]['stock_code']
-                            let buy_price = addComma(rows[i]['buy_price'])
-                            let close = rows[i]['close']
-                            let date_delta = rows[i]['date_delta']
-                            let buy_date = rows[i]['buy_date']
 
-                            let n_close = Number(close.split(",").join(""))
-                            let n_buy_price = Number(buy_price.split(",").join(""))
+        function listing() {
+            $.ajax({
+                type: 'POST',
+                url: '/favorites',
+                data: {user_id_give: $.cookie('user_id')},
+                success: function (response) {
+                    let rows = response['result']
 
-                            let temp_html = ``
+                    for (let i = 0; i < rows.length; i++) {
+                        let stock_name = rows[i]['stock_name']
+                        let stock_code = rows[i]['stock_code']
+                        let buy_price = addComma(rows[i]['buy_price'])
+                        let close = rows[i]['close']
+                        let date_delta = rows[i]['date_delta']
+                        let buy_date = rows[i]['buy_date']
 
-                            let profit_per = (n_close/n_buy_price*100).toFixed(2)
-                            let profit_plus = n_close-n_buy_price
-                            if (n_close > n_buy_price){
-                                temp_html = `
-                                            <div class="card border-danger mb-3" style="max-width: 18rem;">
-                                                <div class="card-header">${stock_name} | ${stock_code}</div>
+                        let n_close = Number(close.split(",").join(""))
+                        let n_buy_price = Number(buy_price.split(",").join(""))
+
+                        let temp_html = ``
+
+                        let profit_per = (n_close / n_buy_price * 100).toFixed(2)
+                        let profit_plus = n_close - n_buy_price
+                        if (n_close > n_buy_price) {
+                            temp_html = `
+                                            <div class="card border-danger mb-3" style="width: 30%;">
+                                                <div class="card-header"><b>${stock_name} | ${stock_code}</b> 😍</div>
                                                 <div class="card-body text-danger">
                                                     <p>매수가: ${buy_price}원</p>
                                                     <p>현재가: ${close}원</p>
@@ -159,10 +158,10 @@
                                                 </div>
                                             </div>
                                 `
-                            }else{
-                                temp_html = `
-                                            <div class="card border-primary mb-3" style="max-width: 18rem;">
-                                                <div class="card-header">${stock_name} | ${stock_code}</div>
+                        } else {
+                            temp_html = `
+                                            <div class="card border-primary mb-3" style="width: 30%;">
+                                                <div class="card-header"><b>${stock_name} | ${stock_code}</b> 😱</div>
                                                 <div class="card-body text-primary">
                                                     <p>매수가: ${buy_price}원</p>
                                                     <p>현재가: ${close}원</p>
@@ -172,20 +171,28 @@
                                                 </div>
                                             </div>
                                 `
-                            }
-
-                            $('#cards-box').append(temp_html);
                         }
-                    }
-                })
-            }
 
-        </script>
+                        $('#cards-box').append(temp_html);
+                    }
+                }
+            })
+        }
+
+    </script>
     <style>
         *, button, input {
+
             font-family: 'Gowun Dodum', sans-serif;
         }
 
+        button, input {
+            box-shadow: 5px 5px 5px grey;
+        }
+
+        body {
+            background-color: #FFFDF9;
+        }
 
         .chart-group {
             width: 100%;
@@ -204,13 +211,29 @@
         }
 
         #myButton {
+            margin-left: 20px;
+            box-shadow: 5px 5px 5px grey;
+            background-color: #FFE3ED;
+            border: 1px transparent;
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        #myButton:hover {
+            color: gray;
+        }
+
+        #logout, #my_page {
+            border: transparent;
+            background-color: #FFE3ED;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            margin-left : 10px;
             font-family: 'Gowun Dodum', sans-serif;
         }
 
         #logout {
-            margin-top: 10px;
-            margin-bottom: 20px;
-            font-family: 'Gowun Dodum', sans-serif;
+            color: black;
+            background-color: #BEEBE9;
         }
 
         .button-group {
@@ -223,10 +246,13 @@
 
         .card {
             margin: 5px;
+            border: 3px solid;
         }
 
         .newInfo {
-            border: 3px solid darkgray;
+            box-shadow: 5px 5px 5px grey;
+            border: 3px solid transparent;
+            background-color: #9BE3DE;
             border-radius: 10px;
             width: 100%;
             max-width: 1100px;
@@ -249,39 +275,54 @@
             margin: 10px;
         }
 
+        .pic {
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 5%;
+            box-shadow: 0 0 20px 20px #FFFDF9 inset;
+            margin: 20px;
+        }
     </style>
-    </head>
+</head>
 
-    <body>
-    <h1 class="h1">나의 주식</h1>
-    <div class="twoGroup">
-        <div class="newInfo">
-            <div class="form-floating mb-3" style="width:230px">
-                <input type="text" class="form-control" id="company_name" placeholder="종목코드">
-                <label for="company_name">회사명</label>
-            </div>
-            <div class="form-floating mb-3" style="width:230px">
-                <input type="text" class="form-control" id="buy_price" placeholder="매수가">
-                <label for="buy_price">매수가</label>
-            </div>
-            <div class="form-floating mb-3" style="width:230px">
-                <input type="text" class="form-control" id="buy_date" placeholder="매수날짜">
-                <label for="buy_date">매수 날짜) 2022-05-10 형식</label>
-            </div>
-            <button type="button" id="myButton" onclick="addMyStock()" class="btn btn-outline-secondary btn-lg">관심종목 추가하기
+<body>
+<div style="display: flex;flex-direction: row;justify-content: center;align-items: center; margin-right:10%">
+    <img class="pic" src="/static/usermain_header.jpg" width="300" height="300" display="block"/>
+    <h1 class="h1"><b>나의 주식</b></h1>
+</div>
+<div class="twoGroup">
+    <div class="newInfo">
+        <div class="form-floating mb-3" style="width:230px">
+            <input type="text" class="form-control" id="company_name" placeholder="종목코드">
+            <label for="company_name">회사명</label>
+        </div>
+        <div class="form-floating mb-3" style="width:230px">
+            <input type="text" class="form-control" id="buy_price" placeholder="매수가">
+            <label for="buy_price">매수가</label>
+        </div>
+        <div class="form-floating mb-3" style="width:230px">
+            <input type="text" class="form-control" id="buy_date" placeholder="매수날짜">
+            <label for="buy_date">매수 날짜) 2022-05-10 형식</label>
+        </div>
+        <button type="button" id="myButton" onclick="addMyStock()" class="btn btn-outline-secondary btn-lg"><b>관심종목
+            추가하기</b>
+        </button>
+    </div>
+    <div id="my-button-group" class="button-group">
+        <div style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
+            <button type="button" id="my_page" onclick="location.href='/my_page'" class="btn btn-warning btn-lg">마이페이지
             </button>
-        </div>
-        <div id="my-button-group" class="button-group">
-            <button type="button" id="logout" onclick="location.href='/my_page'" class="btn btn-warning">마이페이지</button>
-            <button type="button" id="logout" onclick="logout()" class="btn btn-secondary">로그아웃</button>
+            <button type="button" id="logout" onclick="logout()" class="btn btn-secondary btn-lg">로그아웃</button>
         </div>
     </div>
+</div>
 
-    <div class="chart-group" style="margin-top : 20px">
-        <div class="row row-cols-1 row-cols-md-3 g-1" id="cards-box">
-        </div>
+<div class="chart-group" style="margin-top : 20px">
+    <div class="row row-cols-1 row-cols-md-3 g-1" style="width: 90%; padding: 10px" id="cards-box">
     </div>
+</div>
 
-    </body>
+</body>
 
 </html>
