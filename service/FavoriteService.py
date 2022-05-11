@@ -1,3 +1,8 @@
+from datetime import datetime
+
+from util import get_stock_price
+
+
 class FavoriteService:
     favorite_dao = None
 
@@ -8,4 +13,13 @@ class FavoriteService:
         return self.favorite_dao.insert_favorite(doc)
 
     def find_favorites(self, doc):
-        return self.favorite_dao.find_favorites(doc)
+        favorite_stocks = self.favorite_dao.find_favorites(doc)
+
+        return [{
+            'stock_name': stock['stock_name'],
+            'stock_code': stock['stock_code'],
+            'buy_price': stock['buy_price'],
+            'close': get_stock_price(stock),
+            'date_delta': (datetime.now() - stock['buy_date']).days + 1,
+            'buy_date': str(stock['buy_date'])[:10]
+        } for stock in favorite_stocks]
