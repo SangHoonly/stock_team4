@@ -3,18 +3,14 @@ from util import get_hash
 
 class UserDao:
     database = None
-    req = None
 
-    def __init__(self, database, req):
+    def __init__(self, database):
         self.database = database
-        self.req = req
 
-    def insert_user(self):
+    def insert_user(self, doc):
 
         try:
-            self.database.user.insert_one(
-                dict(id=self.req['id_give'], pw=get_hash(self.req['pw_give']), nick=self.req['nickname_give'])
-            )
+            self.database.user.insert_one(doc)
 
         except Exception as exception:
             print(exception)
@@ -24,3 +20,6 @@ class UserDao:
 
     def find_user(self, user):
         return self.database.user.find_one(user)
+
+    # def find_all_user(self, user):
+    #     return self.database.user.find(user)
