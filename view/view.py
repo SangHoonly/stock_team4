@@ -120,12 +120,21 @@ def create_endpoints(app, service):
 
             close = soup.select_one("#chart_area > div.rate_info > div > p.no_today > em > span.blind").text
 
+            date_delta = str(datetime.datetime.now() - stock['buy_date']).split('day')
+            if len(date_delta) == 1:
+                date_delta = 1
+            elif len(date_delta) == 2:
+                date_delta = int(date_delta[0]) + 1
+            else:
+                print("error in date_delta")
+
             temp_doc = {
                 'stock_name': stock['stock_name'],
                 'stock_code': stock['stock_code'],
                 'buy_price': stock['buy_price'],
                 'close': close,
-                'date_delta': str(datetime.datetime.now() - stock['buy_date']).split('day')[0]
+                'date_delta': date_delta,
+                'buy_date': str(stock['buy_date'])[:10]
             }
             result.append(temp_doc)
 

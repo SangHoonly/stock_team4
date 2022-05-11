@@ -31,21 +31,76 @@
                 location.href = "/";
             }
 
+            $(function () {	//화면 로딩후 시작
+                $("#searchInput").autocomplete({  //오토 컴플릿트 시작
+                    source: List,	// source는 data.js파일 내부의 List 배열
+                    focus: function (event, ui) { // 방향키로 자동완성단어 선택 가능하게 만들어줌
+                        return false;
+                    },
+                    minLength: 1,// 최소 글자수
+                    delay: 100,	//autocomplete 딜레이 시간(ms)
+                    //disabled: true, //자동완성 기능 끄기
+                });
+            });
+
+            // 정규표현식 시작
+            function is_stockcode(asValue) {
+                var regExp = /\d{6}/;
+                return regExp.test(asValue);
+            }
+
+            function is_price(asValue) {
+                var regExp = /\d{1,10}/;
+                return regExp.test(asValue);
+            }
+
+            function is_date(asValue) {
+                var regExp = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/;
+                return regExp.test(asValue);
+            }
+
+            function addComma(value){
+                value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                return value;
+            }
+            // 정규표현식 끝
+
             function addMyStock() {
                 let code = $('#code').val()
                 let buy_price = $('#buy_price').val()
                 let buy_date = $('#buy_date').val()
 
-                $.ajax({
-                    type: 'POST',
-                    url: '/favorite',
-                    data: {code_give: code, buy_price_give: buy_price, buy_date_give: buy_date,user_id_give:$.cookie('user_id')},
-                    success: function (response) {
-                        alert(response['msg'])
-                        window.location.reload()
-                    }
-                });
+                if (!code || !buy_price || !buy_date) {
+                    alert("비어 있는 칸이 있으면 안 됩니다!")
+                }
+
+                if (!is_stockcode(code)) {
+                    alert("종목 코드 형식에 맞춰서 작성 해주세요.(ex.005930)")
+                } else if (!is_price(buy_price)) {
+                    alert("매수가 형식에 맞춰서 작성 해주세요.(ex.1~1000000000)")
+                } else if (!is_date(buy_date)) {
+                    alert("날짜 형식에 맞춰서 작성 해주세요.(ex.2022-05-11)")
+                } else if(Number(buy_price) === 0){
+                    alert("매수 가격은 0원이 될 수 없습니다.")
+                }
+                else{
+                    $.ajax({
+                        type: 'POST',
+                        url: '/favorite',
+                        data: {
+                            code_give: code,
+                            buy_price_give: buy_price,
+                            buy_date_give: buy_date,
+                            user_id_give: $.cookie('user_id')
+                        },
+                        success: function (response) {
+                            alert(response['msg'])
+                            window.location.reload()
+                        }
+                    });
+                }
             }
+
 
             function listing() {
                 $.ajax({
@@ -58,22 +113,42 @@
                         for (let i = 0; i < rows.length; i++) {
                             let stock_name = rows[i]['stock_name']
                             let stock_code = rows[i]['stock_code']
-                            let buy_price = rows[i]['buy_price']
+                            let buy_price = addComma(rows[i]['buy_price'])
                             let close = rows[i]['close']
                             let date_delta = rows[i]['date_delta']
+                            let buy_date = rows[i]['buy_date']
 
-                            let temp_html =
-                                `<div class="col_up">
-                                    <div class="card h-100">
-                                        <div class="card-body"">
-                                            <h5 class="card-title">${stock_name}</h5>
-                                            <h5 class="card-title">${stock_code}</h5>
-                                            <h5 class="card-title">매수가: ${buy_price}</h5>
-                                            <h5 class="card-title">현재가: ${close}</h5>
-                                            <h5 class="card-title">보유일수: ${date_delta}일</h5>
-                                        </div>
-                                    </div>
-                                </div>`
+                            let temp_html = ``
+
+                            let profit_per = (Number(close.split(",").join(""))/Number(buy_price.split(",").join(""))*100).toFixed(2)
+                            let profit_plus = Number(close.split(",").join(""))-Number(buy_price.split(",").join(""))
+                            if (close > buy_price){
+                                temp_html = `
+                                            <div class="card border-danger mb-3" style="max-width: 18rem;">
+                                                <div class="card-header">${stock_name} | ${stock_code}</div>
+                                                <div class="card-body text-danger">
+                                                    <p>매수가: ${buy_price}원</p>
+                                                    <p>현재가: ${close}원</p>
+                                                    <p>차익: ${profit_plus}원 | ${profit_per}%</p>
+                                                    <p>매수 일자: ${buy_date}</p>
+                                                    <p>${date_delta}일 보유 중</p>
+                                                </div>
+                                            </div>
+                                `
+                            }else{
+                                temp_html = `
+                                            <div class="card border-primary mb-3" style="max-width: 18rem;">
+                                                <div class="card-header">${stock_name} | ${stock_code}</div>
+                                                <div class="card-body text-primary">
+                                                    <p>매수가: ${buy_price}원</p>
+                                                    <p>현재가: ${close}원</p>
+                                                    <p>차익: ${profit_plus}원 | ${profit_per}%</p>
+                                                    <p>매수 일자: ${buy_date}</p>
+                                                    <p>${date_delta}일 보유 중</p>
+                                                </div>
+                                            </div>
+                                `
+                            }
 
                             $('#cards-box').append(temp_html);
                         }
@@ -97,11 +172,6 @@
                 align-items: center;
             }
 
-            .chart {
-                width: 500px;
-                height: 400px;
-                background-color: yellowgreen;
-            }
 
             .h1 {
                 margin: 30px 30px 50px 30px;
@@ -127,6 +197,10 @@
                 justify-content: center;
                 align-items: end;
             }
+
+            .card {
+                margin: 5px;
+            }
         </style>
     </head>
 
@@ -141,16 +215,16 @@
             <label for="buy_date">매수날짜: (형식:2022-05-10)</label>
             <input id="buy_date" type="text">
             <button type="button" id="myButton" onclick="addMyStock()" class="btn btn-info">관심종목 추가하기</button>
-            <button onclick="listing()">임시</button>
         </div>
         <button type="button" id="logout" onclick="logout()" class="btn btn-secondary">로그아웃</button>
     </div>
 
     <div class="chart-group">
-        <div class="row row-cols-1 row-cols-md-2 g-1" id="cards-box">
+        <div class="row row-cols-1 row-cols-md-3 g-1" id="cards-box">
 
         </div>
     </div>
+
     </body>
 
 </html>
