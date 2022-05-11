@@ -158,9 +158,11 @@
                                                     <p>매수 일자: ${buy_date}</p>
                                                     <p>${date_delta}일 보유 중</p>
                                                 </div>
-                                                <button onclick="delete_stock({_id})" type="button" class="btn btn-outline-danger">삭제</button>
+                                                <button id="${_id}" onclick="delete_stock(this)"type="button" class="btn btn-outline-danger">삭제</button>
                                             </div>
                                 `
+
+                                console.log(`id up :${_id}`)
                             }else{
                                 temp_html = `
                                             <div class="card border-primary mb-3" style="max-width: 18rem;">
@@ -172,9 +174,11 @@
                                                     <p>매수 일자: ${buy_date}</p>
                                                     <p>${date_delta}일 보유 중</p>
                                                 </div>
-                                                <button onclick="delete_stock({_id})" type="button" class="btn btn-outline-danger">삭제</button>
+                                                <button id="${_id}" onclick="delete_stock(this)" type="button" class="btn btn-outline-danger">삭제</button>
                                             </div>
                                 `
+
+                                console.log(`id down :${_id}`)
                             }
 
                             $('#cards-box').append(temp_html);
@@ -183,8 +187,10 @@
                 })
             }
 
-            function delete_stock(_id) {
-                let mdb_id = _id
+            function delete_stock(obj) {
+                let id = obj.id
+                let mdb_id = id
+                console.log(mdb_id)
                 $.ajax({
                     type: 'DELETE',
                     url: '/favorite',
