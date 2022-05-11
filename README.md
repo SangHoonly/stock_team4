@@ -23,8 +23,6 @@ E반 4조의 첫번째 프로젝트!
 
 ###  __Stacks__ 📚
 
-<img src="https://img.shields.io/badge/flask-000000?style=for-the-badge&logo=FLASK&logoColor=white"/><img src="https://img.shields.io/badge/Jinja-B41717?style=for-the-badge&logo=Jinja&logoColor=white]"/><img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=Jinja&logoColor=white]"/><img src="https://img.shields.io/badge/Sourcetree-0052CC?style=for-the-badge&logo=Sourcetree&logoColor=white]"/>
-
 
 #### Server 
 <img src="https://img.shields.io/badge/Amazon%20EC2-232F3E?style=for-the-badge&logo=Amazon%20AWS&logoColor=white]"/>
@@ -40,4 +38,3 @@ E반 4조의 첫번째 프로젝트!
 
 #### Tool
 <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white]"/><img src="https://img.shields.io/badge/Git-00000?style=for-the-badge&logo=Git&logoColor=F05032]"/><img src="https://img.shields.io/badge/Github-181717?style=for-the-badge&logo=Github&logoColor=white]"/><img src="https://img.shields.io/badge/Sourcetree-0052CC?style=for-the-badge&logo=Sourcetree&logoColor=white]"/>
-
