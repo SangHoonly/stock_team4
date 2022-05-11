@@ -56,10 +56,9 @@ def create_endpoints(app, service):
         return jsonify({'result': 'fail', 'msg': '비밀번호가 일치하지 않습니다.'})
 
     # 회원탈퇴
-    @app.route('/api/secession', methods=['POST'])
+    @app.route('/api/secession', methods=['DELETE'])
     def secession_check():
         req = request.form
-
         pw_hash = get_hash(req['pw_give'])
         user = {'id': req['id_give'], 'pw': pw_hash}
         if service.user.delete_user(user):
