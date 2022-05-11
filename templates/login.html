@@ -51,7 +51,6 @@
                     if (response['result'] == 'success') {
                         $.cookie('mytoken', response['token']);
                         $.cookie('user_id', response['user_id']);
-                        alert('로그인 완료!')
                         window.location.href = '/user/main'
                     } else {
                         alert(response['msg'])
@@ -63,7 +62,7 @@
 
 </head>
 <body>
-<section class="hero is-light is-fullheight">
+<section class="hero is-fullheight" style="background: #FFFDF9;">
     <div class="hero-body">
         <div class="container">
             <div class="columns is-centered">

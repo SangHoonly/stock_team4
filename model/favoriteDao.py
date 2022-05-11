@@ -5,14 +5,7 @@ class FavoriteDao:
         self.database = database
 
     def insert_favorite(self, doc):
-        try:
-            self.database.favorites.insert_one(doc)
-
-        except Exception as exception:
-            print(exception)
-            return False
-
-        return True
+        return self.database.favorites.insert_one(doc)
 
     def find_favorites(self, doc):
         return self.database.favorites.find(doc)
