@@ -31,7 +31,7 @@
                     if (response['result'] == 'success') {
                         console.log(response['msg']);
                         $.ajax({
-                            type: "POST", url: "/api/secession", data: {id_give: id, pw_give: password},
+                            type: "DELETE", url: "/api/secession", data: {id_give: id, pw_give: password},
                             success: function (response) {
                                 if (response['result'] == 'success') {
                                     alert(response['msg'])
