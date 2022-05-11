@@ -62,7 +62,10 @@ def create_endpoints(app, service):
         pw_hash = get_hash(req['pw_give'])
         user = {'id': req['id_give'], 'pw': pw_hash}
         if service.user.delete_user(user):
-            return jsonify({'result': 'success', 'msg': '탈퇴 완료'})
+            user = {'user_id': req['id_give']}
+            if service.favorite.delete_favorite_many(user):
+                return jsonify({'result': 'success', 'msg': '탈퇴 완료'})
+            return jsonify({'result': 'fail', 'msg': '탈퇴 실패'})
         return jsonify({'result': 'fail', 'msg': '탈퇴 실패'})
 
     # stock crawling

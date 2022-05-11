@@ -12,3 +12,6 @@ class FavoriteService:
 
     def delete_favorite(self, doc):
         return self.favorite_dao.delete_favorite(doc)
+
+    def delete_favorite_many(self, doc):
+        return self.favorite_dao.delete_favorite_many(doc)
