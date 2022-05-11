@@ -26,6 +26,45 @@ def create_endpoints(app, service):
     def sign_up():
         return render_template('sign_up.html')
 
+    # Rendering my_page Page
+    @app.route('/my_page')
+    def my_page():
+        token_receive = request.cookies.get('mytoken')
+
+        try:
+            payload = jwt.decode(token_receive, JWT_SECRET_KEY, algorithms=['HS256'])
+
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
+
+        result = service.user.find_user({"id": payload['id']})
+        return render_template('my_page.html', id=result["id"], nick=result["nick"])
+
+    # mypage password check
+    @app.route('/api/password-check', methods=['POST'])
+    def password_check():
+        req = request.form
+
+        pw_hash = get_hash(req['pw_give'])
+        user = {'id': req['id_give'], 'pw': pw_hash}
+
+        if service.user.find_user(user):
+            return jsonify({'result': 'success', 'msg': '비밀번호 일치'})
+        return jsonify({'result': 'fail', 'msg': '비밀번호가 일치하지 않습니다.'})
+
+    # 회원탈퇴
+    @app.route('/api/secession', methods=['POST'])
+    def secession_check():
+        req = request.form
+
+        pw_hash = get_hash(req['pw_give'])
+        user = {'id': req['id_give'], 'pw': pw_hash}
+        if service.user.delete_user(user):
+            return jsonify({'result': 'success', 'msg': '탈퇴 완료'})
+        return jsonify({'result': 'fail', 'msg': '탈퇴 실패'})
+
     # stock crawling
     @app.route("/stock/crawling", methods=["GET"])
     def stock_get_crawl():

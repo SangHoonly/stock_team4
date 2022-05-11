@@ -10,3 +10,6 @@ class UserService:
 
     def find_user(self, doc):
         return self.user_dao.find_user(doc)
+
+    def delete_user(self, doc):
+        return self.user_dao.delete_user(doc)

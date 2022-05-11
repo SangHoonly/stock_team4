@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>마이페이지</title>
+
+    <!-- Bulma CSS 링크 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script>
+        let id = `{{id}}`
+
+        function secession_alert() {
+            $('#pw-field').show()
+            $('#alert-btn').hide()
+            $('#secession-btn').show()
+        }
+
+        function secession() {
+            let password = $('#input-password').val()
+            if (password == "") {
+                alert("비밀번호를 입력해주세요.")
+                $("#input-password").focus()
+                return;
+            }
+            $.ajax({
+                type: "POST", url: "/api/password-check", data: {id_give: id, pw_give: password},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        console.log(response['msg']);
+                        $.ajax({
+                            type: "POST", url: "/api/secession", data: {id_give: id, pw_give: password},
+                            success: function (response) {
+                                if (response['result'] == 'success') {
+                                    alert(response['msg'])
+                                    $.removeCookie('user_id', { path: '/' });
+                                    $.removeCookie('mytoken', { path: '/' });;
+                                    location.href = "/"
+                                } else {
+                                    alert(response['msg'])
+                                }
+                            }
+                        });
+                    } else {
+                        alert(response['msg'])
+                    }
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<section class="hero is-light is-fullheight">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+                    <label for="" class="label">마이페이지!</label>
+                    <div class="box">
+                        <div class="field">
+                            <label for="" class="label">ID</label>
+                            <div class="control has-icons-left" style="display: flex">
+                                <input id="input-userid" type="text" placeholder="id" class="input" value="{{ id }}"
+                                       disabled>
+                                <span class="icon is-small is-left">
+                                    <i class="fa fa-envelope"></i>
+                                </span>
+                            </div>
+                            <label for="" class="label">Name</label>
+                            <div class="control has-icons-left">
+                                <input id="input-username" type="text" placeholder="name" class="input"
+                                       value="{{ nick }}" disabled>
+                                <span class="icon is-small is-left">
+                                    <i class="fa fa-envelope"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field" id="alert-btn">
+                            <button class="button is-success" onclick="history.back()">
+                                뒤로
+                            </button>
+                            <button class="button is-danger" onclick="secession_alert()">
+                                회원탈퇴
+                            </button>
+                        </div>
+                        <div class="field" id="pw-field" style="display: none">
+                            <label for="" class="label">비밀번호 확인</label>
+                            <div class="control has-icons-left">
+                                <input id="input-password" type="password" placeholder="*******" class="input">
+                                <span class="icon is-small is-left">
+                                    <i class="fa fa-lock"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field" id="secession-btn" style="display: none">
+                            <button class="button is-success" onclick="history.back()">
+                                뒤로
+                            </button>
+                            <button class="button is-danger" onclick="secession()">
+                                회원탈퇴
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
