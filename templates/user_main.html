@@ -182,7 +182,6 @@
         }
 
         #myButton {
-            color: blue;
             font-family: 'Gowun Dodum', sans-serif;
         }
 
@@ -233,22 +232,26 @@
 
 <body>
 <h1 class="h1">나의 주식</h1>
-<div class="form-floating mb-3" style="width:230px">
-    <input type="text" class="form-control" id="code" placeholder="종목코드">
-    <label for="code">주식 코드</label>
-</div>
-<div class="form-floating mb-3" style="width:230px">
-    <input type="text" class="form-control" id="buy_price" placeholder="매수가">
-    <label for="buy_price">매수가</label>
-</div>
-<div class="form-floating mb-3" style="width:230px">
-    <input type="text" class="form-control" id="buy_date" placeholder="매수날짜">
-    <label for="buy_date">매수 날짜) 2022-05-10 형식</label>
+<div class="twoGroup">
+    <div class="newInfo">
+        <div class="form-floating mb-3" style="width:230px">
+            <input type="text" class="form-control" id="code" placeholder="종목코드">
+            <label for="code">주식 코드</label>
+        </div>
+        <div class="form-floating mb-3" style="width:230px">
+            <input type="text" class="form-control" id="buy_price" placeholder="매수가">
+            <label for="buy_price">매수가</label>
+        </div>
+        <div class="form-floating mb-3" style="width:230px">
+            <input type="text" class="form-control" id="buy_date" placeholder="매수날짜">
+            <label for="buy_date">매수 날짜) 2022-05-10 형식</label>
+        </div>
+        <button type="button" id="myButton" onclick="addMyStock()" class="btn btn-outline-secondary btn-lg">관심종목 추가하기</button>
+    </div>
 </div>
 
 <div id="my-button-group" class="button-group">
 
-    <button type="button" id="myButton" onclick="addMyStock()" class="btn btn-info">관심종목 추가하기</button>
 
     <button type="button" id="logout" onclick="logout()" class="btn btn-secondary">로그아웃</button>
 </div>
