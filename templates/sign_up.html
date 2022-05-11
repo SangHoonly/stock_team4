@@ -17,30 +17,35 @@
             let password = $("#input-password").val()
             let password2 = $("#input-password2").val()
 
+            $("#id-help").html('')
+            $("#password-help").html('')
+            $("#password2-help").html('')
+            $("#name-help").html('')
+
             if (!idcheck) {
-                alert("아이디 중복확인을 해주세요.")
+                $("#id-help").html("아이디 중복확인을 해주세요.")
                 return;
             }
             if (username == "") {
-                alert("이름를 입력해주세요.")
+                $("#name-help").html("이름를 입력해주세요.")
                 $("#input-username").focus()
                 return;
             }
             if (password == "") {
-                alert("비밀번호를 입력해주세요.")
+                $("#password-help").html("비밀번호를 입력해주세요.")
                 $("#input-password").focus()
                 return;
             } else if (!is_password(password)) {
-                alert("비밀번호의 형식을 확인해주세요. 영문과 숫자 필수 포함, 특수문자(!@#$%^&*) 사용가능 5-20자")
+                $("#password-help").html("비밀번호의 형식을 확인해주세요. 영문과 숫자 필수 포함, 특수문자(!@#$%^&*) 사용가능 5-20자")
                 $("#input-password").focus()
                 return;
             }
             if (password2 == "") {
-                alert("비밀번호를 입력해주세요.")
+                $("#password2-help").html("비밀번호를 입력해주세요.")
                 $("#input-password2").focus()
                 return;
             } else if (password2 != password) {
-                alert("비밀번호가 일치하지 않습니다.")
+                $("#password2-help").html("비밀번호가 일치하지 않습니다.")
                 $("#input-password2").focus()
                 return;
             }
@@ -53,7 +58,7 @@
                     nickname_give: username
                 },
                 success: function (response) {
-                    alert("회원가입을 축하드립니다!")
+                    alert("회원가입을 축하드립니다! 로그인 해주세요!")
                     window.location.replace("/login")
                 }
             });
@@ -73,13 +78,13 @@
             let username = $("#input-userid").val()
             console.log(username)
             if (username == "") {
-                alert("아이디를 입력해주세요.")
+                $('#id-help').html("아이디를 입력해주세요.")
                 $("#input-userid").focus()
                 idcheck = false
                 return;
             }
             if (!is_nickname(username)) {
-                alert("아이디의 형식을 확인해주세요. 영문과 숫자, 일부 특수문자(._-) 사용 가능. 2-10자 길이")
+                $('#id-help').html("아이디의 형식을 확인해주세요. 영문과 숫자, 일부 특수문자(._-) 사용 가능. 2-10자 길이")
                 $("#input-userid").focus()
                 idcheck = false
                 return;
@@ -93,12 +98,13 @@
                 },
                 success: function (response) {
                     if (response["exists"]) {
-                        alert("존재하는 아이디 입니다.")
+                        $('#id-help').html("존재하는 아이디 입니다.")
                         $("#input-userid").focus()
                         idcheck = false
                     } else {
-                        alert("사용할 수 있는 아이디입니다.")
+                        $('#id-help').html("사용할 수 있는 아이디입니다.")
                         $("#input-userid").attr("disabled", true);
+                        $('#id-help').attr("style", "color:#3fb14a")
                         idcheck = true
                     }
                     $("#dup-btn").removeClass("is-loading")
@@ -108,7 +114,7 @@
     </script>
 </head>
 <body>
-<section class="hero is-light is-fullheight">
+<section class="hero is-fullheight" style="background: #FFFDF9;">
     <div class="hero-body">
         <div class="container">
             <div class="columns is-centered">
@@ -117,14 +123,19 @@
                     <div class="box">
                         <div class="field">
                             <label for="" class="label">ID</label>
-                            <div class="control has-icons-left" style="display: flex">
-                                <input id="input-userid" type="text" placeholder="id" class="input">
-                                <button class="button is-success" id="dup-btn" onclick="check_dup()">
-                                    중복확인
-                                </button>
-                                <span class="icon is-small is-left">
-                                    <i class="fa fa-envelope"></i>
-                                </span>
+                            <div class="control has-icons-left">
+                                <div style="display: flex">
+                                    <input id="input-userid" type="text" placeholder="id" class="input">
+                                    <button class="button is-success" id="dup-btn" onclick="check_dup()">
+                                        중복확인
+                                    </button>
+                                    <span class="icon is-small is-left">
+                                        <i class="fa fa-envelope"></i>
+                                    </span>
+                                </div>
+                                <div>
+                                    <p id="id-help" style="color: #f43e62"></p>
+                                </div>
                             </div>
                             <label for="" class="label">Name</label>
                             <div class="control has-icons-left">
@@ -133,6 +144,7 @@
                                     <i class="fa fa-envelope"></i>
                                 </span>
                             </div>
+                            <p id="name-help" style="color: #f43e62"></p>
                         </div>
                         <div class="field">
                             <label for="" class="label">Password</label>
@@ -142,6 +154,7 @@
                                     <i class="fa fa-lock"></i>
                                 </span>
                             </div>
+                            <p id="password-help" style="color: #f43e62"></p>
                         </div>
                         <div class="field">
                             <label for="" class="label">Re-enter password</label>
@@ -150,6 +163,7 @@
                                 <span class="icon is-small is-left">
                                     <i class="fa fa-lock"></i>
                                 </span>
+                                <p id="password2-help" style="color: #f43e62"></p>
                             </div>
                         </div>
                         <div class="field">
