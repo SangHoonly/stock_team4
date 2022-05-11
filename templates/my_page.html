@@ -21,7 +21,7 @@
         function secession() {
             let password = $('#input-password').val()
             if (password == "") {
-                alert("비밀번호를 입력해주세요.")
+                $('#password-help').html("비밀번호를 입력해주세요.")
                 $("#input-password").focus()
                 return;
             }
@@ -44,7 +44,7 @@
                             }
                         });
                     } else {
-                        alert(response['msg'])
+                        $('#password-help').html((response['msg']))
                     }
                 }
             });
@@ -52,7 +52,7 @@
     </script>
 </head>
 <body>
-<section class="hero is-light is-fullheight">
+<section class="hero is-fullheight" style="background: #FFFDF9;">
     <div class="hero-body">
         <div class="container">
             <div class="columns is-centered">
@@ -92,6 +92,7 @@
                                 <span class="icon is-small is-left">
                                     <i class="fa fa-lock"></i>
                                 </span>
+                                <p id="password-help" style="color: #f43e62"></p>
                             </div>
                         </div>
                         <div class="field" id="secession-btn" style="display: none">
