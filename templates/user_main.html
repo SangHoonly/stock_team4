@@ -144,35 +144,27 @@
             align-items: center;
         }
 
-        .form-floating{
-             margin : 10px;
+        .form-floating {
+            margin: 10px;
         }
     </style>
 </head>
 
 <body>
 <h1 class="h1">실시간 인기 주식</h1>
-<div class="twoGroup">
-    <div class="newInfo">
-        <div class="form-floating mb-3" style="width:230px">
-            <input type="text" class="form-control" id="code" placeholder="종목코드">
-            <label for="code">주식 코드</label>
-        </div>
-        <div class="form-floating mb-3" style="width:230px">
-            <input type="text" class="form-control" id="buy_price" placeholder="매수가">
-            <label for="buy_price">매수가</label>
-        </div>
-        <div class="form-floating mb-3" style="width:230px">
-            <input type="text" class="form-control" id="buy_date" placeholder="매수날짜">
-            <label for="buy_date">매수 날짜) 2022-05-10 형식</label>
-        </div>
-        <button class="btn btn-outline-secondary btn-lg" onclick="addMyStock()" type="button">등록</button>
-    </div>
-    <div id="my-button-group" class="button-group">
-        <button class="btn btn-dark btn-lg" id="logout" onclick="logout()" type="button">로그아웃</button>
-    </div>
-
+<div class="form-floating mb-3" style="width:230px">
+    <input type="text" class="form-control" id="code" placeholder="종목코드">
+    <label for="code">주식 코드</label>
 </div>
+<div class="form-floating mb-3" style="width:230px">
+    <input type="text" class="form-control" id="buy_price" placeholder="매수가">
+    <label for="buy_price">매수가</label>
+</div>
+<div class="form-floating mb-3" style="width:230px">
+    <input type="text" class="form-control" id="buy_date" placeholder="매수날짜">
+    <label for="buy_date">매수 날짜) 2022-05-10 형식</label>
+</div>
+
 <div class="chart-group">
     <div class="row row-cols-1 row-cols-md-2 g-1" id="cards-box">
 
