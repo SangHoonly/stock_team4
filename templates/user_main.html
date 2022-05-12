@@ -79,13 +79,13 @@
             return regExp.test(asValue);
         }
 
+        // 숫자에 콤마 추가
         function addComma(value) {
             value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             return value;
         }
 
-        // 정규표현식 끝
-
+        // 유저의 관심종목 등록하기
         function addMyStock() {
             let company_name = $('#company_name').val()
             let buy_price = $('#buy_price').val()
@@ -121,7 +121,7 @@
             }
         }
 
-
+        // 유저 개인의 종목 불러오기
         function listing() {
             $.ajax({
                 type: 'POST',
@@ -186,27 +186,9 @@
             })
         }
 
-
+        // 회원삭제기능
         function delete_stock(obj) {
-            let id = obj.id
-            let mdb_id = id
-            console.log(mdb_id)
-            $.ajax({
-                type: 'DELETE',
-                url: '/favorite',
-                data: {
-                    mdb_id_give: mdb_id
-                },
-                success: function (response) {
-                    alert(response['msg'])
-                    window.location.reload()
-                }
-            });
-
-        }
-
-        function delete_stock(obj) {
-            let id = obj.id
+            let id = obj.id     //해당 객체를 직접 가져와 id값에 들어있는 DB의 PK를 받아옴
             let mdb_id = id
             console.log(mdb_id)
             $.ajax({
