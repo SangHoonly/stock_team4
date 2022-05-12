@@ -50,15 +50,10 @@ def create_endpoints(app, service):
     # 회원탈퇴
     @app.route('/api/secession', methods=['DELETE'])
     def secession_check():
-        req = request.form
-        user = {'id': req['id_give'], 'pw': req['pw_give']}
-
-        if is_correct_password(req):
-            service.user.delete_user(user)
-            service.favorite.delete_favorite_many(user)
-            
+        if is_correct_password(request.form):
+            service.user.delete_user({'id': request.form['id_give'], 'pw': get_hash(request.form['pw_give'])})
+            service.favorite.delete_favorite_many({'user_id': request.form['id_give']})
             return jsonify({'result': 'success', 'msg': '탈퇴 완료'})
-
         return jsonify({'result': 'fail', 'msg': '탈퇴 실패'})
 
     # stock crawling
