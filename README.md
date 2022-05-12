@@ -12,14 +12,6 @@ E반 4조의 첫번째 프로젝트!
 
 - AWS EC2 (Ubuntu)
 
-### Prerequisite
-
- 1. Python 3.8
- 2. mongoDB
- 3. Flask, pymongo, dnspython, PyJWT, bs4...
-
-  <!-- ### Usage -->
-
 
 ###  __Stacks__ 📚
 
