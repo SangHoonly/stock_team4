@@ -1,6 +1,6 @@
 ## 실시간 주가 현황 확인 어플리케이션
 
-E반 4조의 첫번째 프로젝트!
+E반 4조의 첫번째 프로젝트! - 
 
 
 ### [Notion 링크](https://right-gargoyle-320.notion.site/99-1-4-a1b219c53df64a65a6b4a7c110446319)
@@ -10,6 +10,11 @@ E반 4조의 첫번째 프로젝트!
 
 - 비회원이 메인페이지를 접근하면 상위 4개의 주식 종류가 보인다.
 - 회원이 메인페이지를 접근하면 자신이 등록한 주식목록과 관심있는 주식을 등록할 수 있다.
+
+### Testing
+
+[![존번의 민족-E반4조](http://img.youtube.com/vi/lXHh35wAfsw/0.jpg)](https://www.youtube.com/embed/lXHh35wAfsw?t=0s) 
+
 
 ### Environment
 
