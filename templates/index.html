@@ -32,7 +32,7 @@
             align-items: center;
         }
 
-        .card-body{
+        .card-body {
             margin: 5px;
             display: flex;
             flex-direction: column;
@@ -71,7 +71,9 @@
 
 <div class="chart-group">
     <div class="row row-cols-1 row-cols-md-2 g-2" id="cards-box">
-          {% for i in range(4) %}
+        <!-- jinja2 사용 -->
+        <!-- 4개의 인기종목을 표시합니다 -->
+        {% for i in range(4) %}
             <div class="col_up">
                 <div class="card h-100">
                     <div class="card-body">
