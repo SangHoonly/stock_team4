@@ -23,7 +23,7 @@ def create_endpoints(app, service):
     def login():
         return render_template('login.html')
 
-    # Rendering sign up Page
+    # Rendering sign up Pa
     @app.route('/sign_up')
     def sign_up():
         return render_template('sign_up.html')
@@ -40,8 +40,10 @@ def create_endpoints(app, service):
     # mypage password check
     @app.route('/api/password-check', methods=['POST'])
     def password_check():
+        req = request.form
+
         return jsonify({'result': 'success', 'msg': '비밀번호 일치'}) \
-            if is_correct_password() \
+            if is_correct_password(req) \
             else jsonify({'result': 'fail', 'msg': '비밀번호가 일치하지 않습니다.'})
 
 
@@ -51,7 +53,7 @@ def create_endpoints(app, service):
         req = request.form
         user = {'id': req['id_give'], 'pw': req['pw_give']}
 
-        if is_correct_password():
+        if is_correct_password(req):
             service.user.delete_user(user)
             service.favorite.delete_favorite_many(user)
             
