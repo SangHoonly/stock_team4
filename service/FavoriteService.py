@@ -21,7 +21,8 @@ class FavoriteService:
             'buy_price': stock['buy_price'],
             'close': get_stock_price(stock),
             'date_delta': (datetime.now() - stock['buy_date']).days + 1,
-            'buy_date': str(stock['buy_date'])[:10]
+            'buy_date': str(stock['buy_date'])[:10],
+            '_id':str(stock['_id'])
         } for stock in favorite_stocks]
 
     def delete_favorite(self, doc):
