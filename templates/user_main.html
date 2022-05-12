@@ -205,24 +205,6 @@
 
         }
 
-        function delete_stock(obj) {
-            let id = obj.id
-            let mdb_id = id
-            console.log(mdb_id)
-            $.ajax({
-                type: 'DELETE',
-                url: '/favorite',
-                data: {
-                    mdb_id_give: mdb_id
-                },
-                success: function (response) {
-                    alert(response['msg'])
-                    window.location.reload()
-                }
-            });
-
-        }
-
     </script>
     <style>
         *, button, input {
